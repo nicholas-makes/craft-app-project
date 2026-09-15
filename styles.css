@@ -1,0 +1,1191 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+  --color-bg-app: #f3efe8;
+  --color-card-bg: #ffffff;
+  --color-border: #e6e0d2;
+  --color-divider: #d8dcdb;
+  --color-text-primary: #1d1f03;
+  --color-text-body: #141414;
+  --color-text-muted: #8b8c87;
+  --color-text-muted-2: #9c9c95;
+  --color-text-placeholder: #ada9a4;
+  --color-input-bg: #f6f4f1;
+  --color-input-border: #decea2;
+  --color-input-text: #423525;
+  --color-olive: #3b3f0a;
+  --color-olive-text: #f2f2f2;
+  --color-radio-selected: #e7ac08;
+  --color-radio-border: #aebdba;
+  --color-btn-disabled-bg: #99998d;
+  --color-btn-disabled-text: #dee2d4;
+  --color-tag-text: #444141;
+  --color-tag-neutral-bg: #f1f1f1;
+  --color-tag-low-bg: #e9e0bb;
+  --color-tag-alert-bg: #ead4cf;
+  --color-item-sub: #ababab;
+  --color-item-sub-alert: #987f7f;
+  --color-search-placeholder: #b8b8b8;
+  --color-track-bg: #fafafa;
+  --color-scrollbar-track: #f0f0f0;
+  --color-scrollbar-thumb: #c3c3c3;
+}
+
+* { box-sizing: border-box; cursor: none !important; }
+button { font-family: inherit; }
+button:focus { outline: none; }
+
+/* ---------- Custom cursor ---------- */
+#custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 999999;
+}
+
+.cursor-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border-radius: 50%;
+  background: rgba(130, 130, 130, 0.4);
+}
+
+.cursor-dot.pressing { animation: cursor-press 0.32s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@keyframes cursor-press {
+  0% { transform: scale(1); }
+  35% { transform: scale(0.45); }
+  100% { transform: scale(1); }
+}
+
+body.dragging-scroll { user-select: none; -webkit-user-select: none; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewport-scaler {
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* ---------- iPhone chassis ---------- */
+/* Matches Figma's own device chrome exactly: a plain 2px black outline
+   directly on the 393x852 frame (see node 234:1252 -- "border-2 border-black
+   border-solid rounded-[47px]"), not a thick physical chassis. */
+.iphone-bezel {
+  position: relative;
+  width: 393px;
+  height: 852px;
+  border: 4px solid #000;
+  border-radius: 47px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 47px;
+  overflow: hidden;
+  /* Rounding the ancestor .viewport-scaler's fractional scale() factor can
+     leave a hairline seam at the clipped corners where the browser's
+     rasterizer doesn't perfectly composite the scaled border-radius --
+     forcing this onto its own layer fixes it. */
+  transform: translateZ(0);
+  /* A real app doesn't let you select arbitrary text by click-dragging --
+     applying this once at the screen root (rather than only on the few
+     lists I'd remembered to fix) covers every scrollable area consistently.
+     Text inputs are a browser-level exception to user-select, so typing in
+     Add Name / quantity fields is unaffected. */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dynamic-island {
+  position: absolute;
+  top: 13.5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 125px;
+  height: 37px;
+  background: #000;
+  border-radius: 19px;
+  z-index: 500;
+  pointer-events: none;
+}
+
+/* ---------- Status bar ---------- */
+.status-bar {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 25px 0 27px;
+  z-index: 50;
+}
+
+.status-bar .time {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+  letter-spacing: -0.2px;
+  padding-top: 2px;
+}
+
+.status-bar .status-icons {
+  display: flex;
+  align-items: center;
+  padding-top: 2px;
+}
+
+.status-bar .status-icons img {
+  height: 13px;
+  display: block;
+}
+
+/* ---------- Page / modal shell ---------- */
+.page,
+.modal-full {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-app);
+}
+
+.modal-full {
+  background: #fff;
+  transform: translateY(100%);
+  transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 400;
+}
+
+.modal-full.open {
+  transform: translateY(0);
+}
+
+[hidden] { display: none !important; }
+
+/* ---------- Catalog page ---------- */
+/* Values sourced from Figma node 234:1252 ("Home" / Catalog, Products filtered) */
+.page-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px 0;
+}
+
+.title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+}
+
+/* Outer 44x44 is just the touch target (transparent); the visible olive
+   circle is a smaller 38x38 disc centered inside it (node 234:1360). */
+.fab-add {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.fab-add-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 19px;
+  background: var(--color-olive);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fab-add-circle img { width: 16px; height: 16px; }
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  flex-shrink: 0;
+  background: #fff;
+  border-radius: 22px;
+  padding: 0 22px;
+  color: var(--color-search-placeholder);
+  font-size: 16px;
+}
+
+.search-bar img { flex-shrink: 0; width: 16px; height: 16px; }
+
+.item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 100px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: none;
+}
+.item-list::-webkit-scrollbar { display: none; }
+
+.item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-card-bg);
+  border-radius: 10px;
+  padding: 10px;
+  flex-shrink: 0;
+  animation: none;
+}
+
+.item-card.new-item {
+  animation: highlightIn 1.4s ease;
+}
+
+@keyframes highlightIn {
+  0% { background: #eef0df; }
+  100% { background: var(--color-card-bg); }
+}
+
+.item-card .item-name {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.item-card .item-sub {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-item-sub);
+  margin: 0;
+}
+
+.item-card .item-sub.alert { color: var(--color-item-sub-alert); }
+
+.status-tag {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-tag-text);
+  padding: 2px 8px;
+  border-radius: 16px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.status-tag.neutral { background: var(--color-tag-neutral-bg); }
+.status-tag.low { background: var(--color-tag-low-bg); }
+.status-tag.alert { background: var(--color-tag-alert-bg); }
+
+/* ---------- Bottom nav (liquid glass) ---------- */
+.bottom-nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 20px;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.nav-pill {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
+}
+
+.nav-item {
+  width: 60px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.nav-item.active { background: #ececec; }
+
+.nav-item img { width: 22px; height: 22px; display: block; }
+.nav-item[data-nav="analytics"] img { width: 26px; }
+.nav-item[data-nav="plan"] img { width: 23px; }
+
+/* ---------- Modal: Add Name ---------- */
+.modal-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 0 16px 40px;
+  overflow-y: auto;
+}
+
+.cancel-btn {
+  /* Figma's Cancel row uses items-start on its parent column, so the
+     button shrink-wraps to its own text and sits flush left -- the
+     "justify-center" in the Figma export is a no-op on a same-size box. */
+  align-self: flex-start;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--color-text-body);
+  height: 44px;
+  flex-shrink: 0;
+}
+
+.name-block {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 0;
+}
+
+.name-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--color-text-muted-2);
+  padding: 0;
+  width: 100%;
+}
+
+.name-input.filled { color: var(--color-text-primary); font-weight: 500; }
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-pill {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: normal;
+  background: #fff;
+  color: #6f6f6f;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.18);
+}
+
+.filter-pill.active {
+  background: var(--color-olive);
+  color: var(--color-olive-text);
+  box-shadow: none;
+}
+
+.card-block {
+  border-top: 0.5px solid var(--color-divider);
+  border-bottom: 0.5px solid var(--color-divider);
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.simple-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  cursor: pointer;
+}
+
+.simple-row .row-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.simple-row .row-left img { width: 16px; height: 16px; }
+.simple-row .row-left span { font-size: 16px; color: var(--color-text-muted-2); }
+
+.icon-slot {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.radio-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  cursor: pointer;
+}
+
+.radio-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  border: 1px solid var(--color-radio-border);
+  background: #fff;
+  flex-shrink: 0;
+  margin: 12px;
+}
+
+.radio-item.selected .radio-box {
+  background: var(--color-radio-selected);
+  border-color: var(--color-radio-selected);
+}
+
+.radio-text { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+.radio-text .radio-title { font-size: 16px; color: var(--color-text-primary); }
+.radio-text .radio-sub { font-size: 14px; color: var(--color-text-muted); font-weight: 500; }
+
+/* An option-slot holds one radio header (Unit Item / Measurable Item).
+   Unselected: plain row, no background. Selected: the header and its
+   fields share one #fafafa rounded box, header gets 20px bottom padding
+   before the first field -- matches Figma's item-options-container where
+   the selected radio-item is the box's own first child, not a sibling. */
+.option-slot {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.option-slot.expanded {
+  background: var(--color-track-bg);
+  border-radius: 10px;
+  padding: 10px 0;
+  gap: 4px;
+}
+
+.option-slot.expanded .radio-item { padding: 0 0 20px; }
+
+.options-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  gap: 0;
+}
+
+.field-row .icon-slot img { width: 16px; height: 16px; }
+.field-row.unit-row .icon-slot img { width: 10px; height: 16px; }
+#amount-row .icon-slot img,
+#rough-row .icon-slot img,
+#unit-count-row .icon-slot img { width: 13px; height: 16px; }
+.buffer-row .icon-slot img { width: 14px; height: 14px; }
+
+.field-input {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  border: 0.5px solid var(--color-input-border);
+  background: var(--color-input-bg);
+  border-radius: 10px;
+  padding: 6px 12px;
+  color: var(--color-input-text);
+  outline: none;
+  width: 195px;
+}
+
+.field-input::placeholder { color: var(--color-text-placeholder); }
+
+.field-row.unit-row .field-input {
+  color: var(--color-text-placeholder);
+  cursor: pointer;
+  caret-color: transparent;
+}
+
+.field-row.unit-row.chosen .field-input {
+  color: var(--color-input-text);
+}
+
+.field-row .spacer { flex: 1; }
+
+.field-row .suffix-text {
+  font-size: 16px;
+  color: var(--color-text-muted-2);
+  padding-right: 16px;
+}
+
+.chevron-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  flex-shrink: 0;
+}
+.chevron-btn img { width: 7px; height: 14px; }
+
+.buffer-row .field-input { width: 60px; text-align: center; }
+.buffer-row .buffer-help {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: #969696;
+  padding-left: 12px;
+}
+
+.cost-display {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding-right: 16px;
+  font-size: 16px;
+}
+.cost-display .cost-label { color: var(--color-text-muted); }
+.cost-display .cost-value { color: var(--color-text-muted); }
+.cost-display .cost-value.has-value { color: var(--color-text-primary); }
+
+.create-btn {
+  font-family: inherit;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: not-allowed;
+  background: var(--color-btn-disabled-bg);
+  color: var(--color-btn-disabled-text);
+  flex-shrink: 0;
+}
+
+.create-btn.ready {
+  cursor: pointer;
+  background: var(--color-olive);
+  /* Figma keeps the same #dee2d4 label color in both the disabled and
+     enabled (olive) button states -- only the background changes. */
+  color: var(--color-btn-disabled-text);
+}
+
+/* ---------- Unit picker sheet ---------- */
+.unit-picker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 75%;
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+  transform: translateY(100%);
+  transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 16px 24px;
+}
+
+.unit-picker.open { transform: translateY(0); }
+
+.unit-picker .close-x {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+.unit-picker .close-x img { width: 16px; height: 16px; }
+
+.unit-list-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  position: relative;
+}
+
+.unit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 14px 0 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scrollbar-width: none;
+}
+.unit-list::-webkit-scrollbar { display: none; }
+
+.unit-option {
+  background: #f7f7f7;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 16px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.unit-option:active { background: #ececec; }
+
+.scrollbar-track {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--color-scrollbar-track);
+  flex-shrink: 0;
+  position: relative;
+  margin-left: 4px;
+}
+
+.scrollbar-thumb {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  border-radius: 2px;
+  background: var(--color-scrollbar-thumb);
+}
+
+/* ================= Create Product flow (Frames 64, 66-77) ================= */
+
+.footer-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.footer-btn {
+  font-family: inherit;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  background: #fff;
+  color: #4b4c47;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.18);
+  width: 100%;
+}
+
+/* ---- variation block (one per "add variation" tap) ---- */
+.variation-block {
+  background: #fff;
+  border-top: 0.5px solid var(--color-divider);
+  border-bottom: 0.5px solid var(--color-divider);
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  flex-shrink: 0;
+  margin-bottom: 22px;
+}
+
+.variation-label-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.variation-label-row .chevron-btn { cursor: pointer; }
+.variation-label-row .variation-pencil img { width: 14px; height: 14px; }
+
+.variation-label {
+  font-size: 16px;
+  color: var(--color-text-primary);
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  padding: 0;
+  width: auto;
+  max-width: 200px;
+}
+
+/* ---- ingredient-editable: measurable (expandable quantity box) ----
+   Figma's own component root has zero padding at all (just gap-10
+   between the header and input rows) -- the visible inset comes entirely
+   from the header's own pl-16/pt-8 and the input row's fixed 44px height. */
+.ingredient-editable {
+  background: var(--color-track-bg);
+  border-radius: 10px;
+  width: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ie-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 0;
+  width: 100%;
+}
+
+/* Base name/rate styling -- not scoped to .ie-header, since the flat
+   (unit-type) row places .ie-name directly under .ie-left with no .ie-header
+   wrapper at all. Leaving these scoped meant the flat row's name silently
+   fell back to an unstyled browser-default <p>. */
+.ie-name { font-size: 14px; font-weight: 500; color: var(--color-olive); margin: 0; }
+.ie-rate { font-size: 14px; font-weight: 500; color: var(--color-item-sub); margin: 0; }
+
+.ie-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  width: 100%;
+}
+
+.ie-input-row .ie-left { display: flex; align-items: center; }
+
+.ie-remove {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+.ie-remove img { width: 8px; height: 8px; }
+
+.ie-qty-input {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  border: 0.5px solid var(--color-input-border);
+  background: var(--color-input-bg);
+  border-radius: 10px;
+  padding: 6px 12px;
+  color: var(--color-input-text);
+  outline: none;
+  /* 120px clipped "add quantity" to "add quantit" -- widened to comfortably
+     fit the longest placeholder used here. */
+  width: 165px;
+}
+.ie-qty-input::placeholder { color: var(--color-text-placeholder); }
+
+.ie-line-total {
+  font-size: 16px;
+  color: var(--color-text-muted-2);
+  padding-right: 16px;
+}
+
+/* ---- ingredient-editable: unit type (flat, no quantity) ---- */
+.ingredient-editable.flat {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  height: 44px;
+}
+.ingredient-editable.flat .ie-left { display: flex; align-items: center; gap: 10px; }
+.ingredient-editable.flat .ie-name { padding: 0; }
+.ingredient-editable.flat .ie-line-total { color: var(--color-text-muted-2); font-weight: 400; }
+
+/* ---- Add Ingredient / Hours to make rows (reuse .field-row look) ---- */
+.hours-row .hours-input {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  border: 0.5px solid var(--color-input-border);
+  background: var(--color-input-bg);
+  border-radius: 10px;
+  padding: 6px 12px;
+  color: var(--color-text-placeholder);
+  width: 195px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hours-row .hours-input.filled { color: var(--color-input-text); }
+.hours-row .hours-input .hours-suffix { color: var(--color-text-muted-2); margin-left: 10px; }
+.hours-row .info-slot { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.hours-row .info-slot img { width: 16px; height: 16px; }
+
+.total-display {
+  /* Figma declares this row whitespace-nowrap -- it's meant to always
+     fit on one line at this width, not wrap. */
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding-right: 16px;
+  font-size: 16px;
+  width: 100%;
+  white-space: nowrap;
+}
+.total-display .t-label { color: var(--color-text-muted); }
+.total-display .t-value { color: var(--color-text-primary); }
+.total-display .t-muted { color: var(--color-text-muted); }
+
+/* ================= Ingredient picker (full screen) ================= */
+.ingredient-picker-screen { z-index: 500; }
+
+.ip-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 16px;
+  overflow: hidden;
+}
+
+.ip-header-block { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+
+.ip-close-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+.ip-close-btn img { width: 16px; height: 16px; }
+
+.ip-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.ip-title-group { display: flex; align-items: center; gap: 10px; }
+.ip-title { font-size: 20px; color: var(--color-text-primary); margin: 0; font-weight: 400; }
+
+.done-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+.done-button-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background: var(--color-olive);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.done-button-circle img { width: 18px; height: 13px; }
+
+.ip-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  width: 100%;
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  padding: 0 22px;
+  flex-shrink: 0;
+}
+.ip-search-bar img { width: 16px; height: 16px; flex-shrink: 0; }
+.ip-search-bar input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  color: var(--color-text-primary);
+  width: 100%;
+}
+.ip-search-bar input::placeholder { color: var(--color-search-placeholder); }
+
+.ip-filter-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  /* extra vertical padding so each chip's box-shadow has room to render
+     without being clipped by the row's own overflow-x:auto (which forces
+     overflow-y to clip too, flush against the content box otherwise) */
+  padding: 6px 0 6px 4px;
+  margin: -6px 0;
+  width: 100%;
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.ip-filter-row::-webkit-scrollbar { display: none; }
+
+.filter-chip {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.18);
+  color: #6f6f6f;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.filter-chip.active {
+  background: var(--color-olive);
+  color: var(--color-olive-text);
+  box-shadow: none;
+}
+.filter-chip .chip-x { width: 8px; height: 8px; display: none; }
+.filter-chip.active .chip-x { display: inline-block; }
+
+.ip-clear-selection {
+  /* Figma's row uses items-start on its parent column and has no width of
+     its own, so it shrink-wraps and sits flush left -- same pattern as the
+     Cancel button; "justify-center" in the export is a no-op here. */
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  height: 44px;
+  align-self: flex-start;
+  font-size: 14px;
+  color: #4c4c4c;
+  flex-shrink: 0;
+}
+
+.ip-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 40px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scrollbar-width: none;
+}
+.ip-list::-webkit-scrollbar { display: none; }
+
+.ip-row {
+  background: var(--color-track-bg);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.ip-row .ip-left { display: flex; align-items: center; gap: 12px; }
+
+.ip-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid #606c08;
+  background: #fff;
+  flex-shrink: 0;
+}
+.ip-row.selected .ip-checkbox { background: var(--color-olive); }
+
+.ip-text { display: flex; flex-direction: column; }
+.ip-text .ip-name { font-size: 16px; font-weight: 400; color: var(--color-text-primary); margin: 0; }
+.ip-text .ip-stock { font-size: 14px; font-weight: 500; color: var(--color-item-sub); margin: 0; }
+.ip-price { font-size: 14px; font-weight: 500; color: var(--color-item-sub); white-space: nowrap; }
+
+/* ================= Hours to Make bottom sheet ================= */
+.hours-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  top: 62px;
+  height: calc(100% - 62px);
+  backdrop-filter: blur(3px);
+  background: rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: flex-end;
+  z-index: 600;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.hours-sheet-backdrop.open { transform: translateY(0); }
+
+.hours-sheet {
+  background: #fff;
+  width: 100%;
+  border-radius: 30px 30px 0 0;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  padding: 16px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hours-sheet-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  width: 100%;
+  position: relative;
+}
+.hours-sheet-info { width: 16px; height: 16px; }
+.hours-sheet-title { font-size: 20px; color: var(--color-olive); margin: 0; }
+.hours-sheet-close {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.hours-sheet-close img { width: 12px; height: 12px; }
+
+.hours-sheet-copy {
+  font-size: 16px;
+  color: #8d8d88;
+  text-align: center;
+  margin: 0;
+  width: 100%;
+}
+
+.hours-sheet-field { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.hours-sheet-field label { font-size: 14px; color: #2d2d28; }
+
+.hours-sheet-input-row {
+  background: #f4f4f4;
+  height: 44px;
+  border-radius: 10px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+/* Figma: empty state is one plain muted placeholder ("$USD" / "hours");
+   once a value is typed it splits into a dark value on the left and a
+   persistent muted unit label on the right (justify-between). */
+.hs-dollar { font-size: 16px; color: var(--color-text-primary); }
+.hs-unit { font-size: 16px; color: var(--color-text-muted-2); flex-shrink: 0; }
+.hours-sheet-input-row input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  color: var(--color-text-primary);
+  flex: 1;
+  min-width: 0;
+}
+.hours-sheet-input-row input::placeholder { color: var(--color-text-muted-2); }

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Craft &mdash; Create Ingredient Prototype</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div id="custom-cursor"><div class="cursor-dot"></div></div>
+
+<div class="viewport-scaler" id="scaler">
+  <div class="iphone-bezel">
+    <div class="dynamic-island"></div>
+    <div class="screen" id="screen">
+
+      <!-- ============ CATALOG PAGE ============ -->
+      <div class="page" id="page-catalog">
+        <div class="status-bar">
+          <span class="time">9:41</span>
+          <span class="status-icons"><img src="assets/icons/status-bar-right.svg" alt="" /></span>
+        </div>
+
+        <div class="page-content">
+          <div class="title-block">
+            <h1 class="page-title">Catalog</h1>
+            <div class="top-row">
+              <div class="filter-group">
+                <button class="filter-pill active" id="tab-products" data-tab="products">Products</button>
+                <button class="filter-pill" id="tab-ingredients" data-tab="ingredients">Ingredients</button>
+              </div>
+              <button class="fab-add" id="btn-open-add" aria-label="Add">
+                <span class="fab-add-circle">
+                  <img src="assets/icons/add-catalog.svg" alt="" />
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div class="search-bar">
+            <img src="assets/icons/search.svg" alt="" />
+            <span>search</span>
+          </div>
+
+          <ul class="item-list" id="list-products">
+            <li class="item-card">
+              <div><p class="item-name">Vertical Wallet</p><p class="item-sub">4 in stock</p></div>
+              <span class="status-tag low">Low</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Vertical Wallet</p><p class="item-sub alert">Made to Order</p></div>
+              <span class="status-tag alert">Unavailable</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Vertical Wallet</p><p class="item-sub">4 in stock</p></div>
+              <span class="status-tag low">Low</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Vertical Wallet</p><p class="item-sub">Made to Order</p></div>
+              <span class="status-tag neutral">Available</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Brass Keychain</p><p class="item-sub">7 in stock</p></div>
+              <span class="status-tag neutral">In Stock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Vertical Wallet</p><p class="item-sub">Made to Order</p></div>
+              <span class="status-tag neutral">Available</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Vertical Wallet</p><p class="item-sub alert">0 in stock</p></div>
+              <span class="status-tag alert">Restock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Vertical Wallet</p><p class="item-sub">4 in stock</p></div>
+              <span class="status-tag low">Low</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Vertical Wallet</p><p class="item-sub">4 in stock</p></div>
+              <span class="status-tag low">Low</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Messenger Bag</p><p class="item-sub">Made to Order</p></div>
+              <span class="status-tag neutral">Available</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Horizontal Wallet</p><p class="item-sub">Made to Order</p></div>
+              <span class="status-tag neutral">Available</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Passport Holder</p><p class="item-sub alert">0 in stock</p></div>
+              <span class="status-tag alert">Restock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Leather Tote Bag</p><p class="item-sub">3 in stock</p></div>
+              <span class="status-tag low">Low</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Card Holder</p><p class="item-sub">15 in stock</p></div>
+              <span class="status-tag neutral">In Stock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Leather Belt</p><p class="item-sub alert">Made to Order</p></div>
+              <span class="status-tag alert">Unavailable</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Zip Pouch</p><p class="item-sub">9 in stock</p></div>
+              <span class="status-tag neutral">In Stock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Brass Keychain</p><p class="item-sub">7 in stock</p></div>
+              <span class="status-tag neutral">In Stock</span>
+            </li>
+          </ul>
+
+          <ul class="item-list" id="list-ingredients" hidden>
+            <li class="item-card">
+              <div><p class="item-name">Olive Green Leather</p><p class="item-sub">4 / 12 sq ft</p></div>
+              <span class="status-tag neutral">In Stock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Zipper Tape</p><p class="item-sub">27 / 30 ft</p></div>
+              <span class="status-tag neutral">In Stock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Purple Leather</p><p class="item-sub alert">2.75 / 12 sq ft</p></div>
+              <span class="status-tag alert">Restock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Brass Rivets</p><p class="item-sub">4 / 10</p></div>
+              <span class="status-tag low">Low</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Light Brown Thread</p><p class="item-sub">37 / 50 ft</p></div>
+              <span class="status-tag neutral">In Stock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Glue</p><p class="item-sub">4 / 12 ml</p></div>
+              <span class="status-tag low">Low</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Rope</p><p class="item-sub">8.5 / 20 ft</p></div>
+              <span class="status-tag neutral">In Stock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Bright Green Leather</p><p class="item-sub">4 / 12 sq ft</p></div>
+              <span class="status-tag low">Low</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Blue Leather</p><p class="item-sub">10 / 12 sq ft</p></div>
+              <span class="status-tag neutral">In Stock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Waxed Thread</p><p class="item-sub">45 / 100 ft</p></div>
+              <span class="status-tag neutral">In Stock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Snap Buttons</p><p class="item-sub">6 / 50</p></div>
+              <span class="status-tag low">Low</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Edge Paint</p><p class="item-sub alert">0 / 8 oz</p></div>
+              <span class="status-tag alert">Restock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Leather Dye</p><p class="item-sub">3 / 10 oz</p></div>
+              <span class="status-tag low">Low</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Contact Cement</p><p class="item-sub">12 / 16 oz</p></div>
+              <span class="status-tag neutral">In Stock</span>
+            </li>
+            <li class="item-card">
+              <div><p class="item-name">Beeswax</p><p class="item-sub">2 / 5 blocks</p></div>
+              <span class="status-tag low">Low</span>
+            </li>
+          </ul>
+        </div>
+
+        <nav class="bottom-nav">
+          <div class="nav-pill">
+            <button class="nav-item" data-nav="home"><img src="assets/nav/home-unselected.svg" alt="Home" /></button>
+            <button class="nav-item active" data-nav="catalog"><img src="assets/nav/catalog-selected.svg" alt="Catalog" /></button>
+            <button class="nav-item" data-nav="analytics"><img src="assets/nav/analytics-unselected.svg" alt="Analytics" /></button>
+            <button class="nav-item" data-nav="plan"><img src="assets/nav/plan-unselected.svg" alt="Plan" /></button>
+            <button class="nav-item" data-nav="profile"><img src="assets/nav/profile-unselected.svg" alt="Profile" /></button>
+          </div>
+        </nav>
+      </div>
+
+      <!-- ============ ADD NAME MODAL ============ -->
+      <div class="modal-full" id="modal-add">
+        <div class="status-bar">
+          <span class="time">9:41</span>
+          <span class="status-icons"><img src="assets/icons/status-bar-right.svg" alt="" /></span>
+        </div>
+
+        <div class="modal-content">
+          <button class="cancel-btn" id="btn-cancel">Cancel</button>
+
+          <div class="name-block">
+            <input class="name-input" id="name-input" placeholder="Add Name" autocomplete="off" />
+
+            <div class="filter-row">
+              <button class="filter-pill active" id="filter-product" data-filter="product">Product</button>
+              <button class="filter-pill" id="filter-ingredient" data-filter="ingredient">Ingredient</button>
+            </div>
+          </div>
+
+          <!-- Product tab: Create Product flow (Frames 64, 66-76) -->
+          <div id="product-tab-content">
+            <!-- Frame 64: empty state, just the Add Ingredient row, no footer yet -->
+            <div class="card-block" id="product-empty-row">
+              <div class="simple-row" id="product-add-ingredient-empty">
+                <div class="row-left">
+                  <span class="icon-slot"><img src="assets/icons/add.svg" alt="" /></span>
+                  <span>Add Ingredient</span>
+                </div>
+                <button class="chevron-btn"><img src="assets/icons/caret-right.svg" alt="" /></button>
+              </div>
+            </div>
+
+            <!-- One card-block per variation, cloned via JS -->
+            <div id="product-variations"></div>
+
+            <div class="footer-buttons" id="product-footer" hidden>
+              <button class="footer-btn" id="btn-add-variation">add variation</button>
+              <button class="footer-btn" id="btn-save-draft">save as draft</button>
+              <button class="create-btn" id="btn-create-product">Create Product</button>
+            </div>
+          </div>
+
+          <!-- Ingredient tab -->
+          <div class="card-block" id="ingredient-tab-content" hidden>
+            <!-- Unit Item slot: plain row when unselected, expands into its own
+                 box (header + non-functional fields) when selected -->
+            <div class="option-slot" id="unit-slot">
+              <div class="radio-item" id="radio-unit-header" data-type="unit">
+                <span class="radio-box"></span>
+                <div class="radio-text">
+                  <span class="radio-title">Unit Item</span>
+                  <span class="radio-sub">Ingredient is countable, 5 buckles</span>
+                </div>
+              </div>
+              <div class="options-fields" id="unit-fields" hidden>
+                <div class="field-row" id="unit-count-row">
+                  <span class="icon-slot"><img src="assets/icons/number-pad.svg" alt="" /></span>
+                  <input class="field-input" placeholder="Add Unit Count" disabled />
+                </div>
+                <div class="field-row">
+                  <span class="icon-slot"><img src="assets/icons/dollar-amount.svg" alt="" /></span>
+                  <input class="field-input" placeholder="Amount You Paid" disabled />
+                </div>
+                <div class="cost-display">
+                  <span class="cost-label">Cost per unit</span>
+                  <span class="cost-value">$</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Measurable Item slot: plain row when unselected, expands into its
+                 own box (header + live fields) when selected -->
+            <div class="option-slot" id="measurable-slot">
+              <div class="radio-item" id="radio-measurable-header" data-type="measurable">
+                <span class="radio-box"></span>
+                <div class="radio-text">
+                  <span class="radio-title">Measurable Item</span>
+                  <span class="radio-sub">Ingredient is measurable, 5 ft of thread</span>
+                </div>
+              </div>
+              <div class="options-fields" id="measurable-fields" hidden>
+                <div class="field-row unit-row" id="unit-row">
+                  <span class="icon-slot"><img src="assets/icons/measurement-unit.svg" alt="" /></span>
+                  <input class="field-input" id="unit-field" placeholder="I want to measure by" readonly />
+                  <span class="spacer"></span>
+                  <button class="chevron-btn" id="btn-open-unit-picker"><img src="assets/icons/caret-right.svg" alt="" /></button>
+                </div>
+
+                <div class="field-row" id="total-row">
+                  <span class="icon-slot"><img src="assets/icons/dollar-amount.svg" alt="" /></span>
+                  <input class="field-input" id="total-field" placeholder="Amount You Paid" inputmode="decimal" />
+                </div>
+
+                <div class="field-row" id="amount-row" hidden>
+                  <span class="icon-slot"><img src="assets/icons/number-pad.svg" alt="" /></span>
+                  <input class="field-input" id="amount-field" placeholder="Amount I have" inputmode="decimal" />
+                </div>
+
+                <div class="field-row" id="rough-row" hidden>
+                  <span class="icon-slot"><img src="assets/icons/number-pad.svg" alt="" /></span>
+                  <input class="field-input" id="rough-field" placeholder="Rough Amount of Uses" inputmode="decimal" />
+                </div>
+
+                <div class="field-row buffer-row" id="buffer-row" hidden>
+                  <span class="icon-slot"><img src="assets/icons/percentage.svg" alt="" /></span>
+                  <input class="field-input" id="buffer-field" value="10" inputmode="decimal" />
+                  <span class="buffer-help">a buffer accounts for ingredient waste</span>
+                </div>
+
+                <div class="cost-display">
+                  <span class="cost-label" id="cost-label">Cost per..</span>
+                  <span class="cost-value" id="cost-value">$</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="create-btn" id="btn-create">Create Ingredient</button>
+        </div>
+
+        <!-- ===== Unit picker sheet ===== -->
+        <div class="unit-picker" id="unit-picker">
+          <button class="close-x" id="btn-close-unit-picker"><img src="assets/icons/x-large.svg" alt="Close" /></button>
+          <div class="unit-list-wrap">
+            <ul class="unit-list" id="unit-list">
+              <li class="unit-option" data-unit="uses">uses</li>
+              <li class="unit-option" data-unit="lbs">lbs</li>
+              <li class="unit-option" data-unit="grams">grams</li>
+              <li class="unit-option" data-unit="oz">oz</li>
+              <li class="unit-option" data-unit="ml">ml</li>
+              <li class="unit-option" data-unit="liters">liters</li>
+              <li class="unit-option" data-unit="fl oz">fl oz</li>
+              <li class="unit-option" data-unit="pints">pints</li>
+              <li class="unit-option" data-unit="tbpsn">tbpsn</li>
+              <li class="unit-option" data-unit="tspn">tspn</li>
+              <li class="unit-option" data-unit="cups">cups</li>
+              <li class="unit-option" data-unit="in">in</li>
+              <li class="unit-option" data-unit="ft">ft</li>
+              <li class="unit-option" data-unit="sq ft">sq ft</li>
+              <li class="unit-option" data-unit="meters">meters</li>
+              <li class="unit-option" data-unit="yds">yds</li>
+            </ul>
+            <div class="scrollbar-track"><div class="scrollbar-thumb" id="scrollbar-thumb"></div></div>
+          </div>
+        </div>
+
+        <!-- ===== Ingredient picker (full screen) -- Frames 65/77 ===== -->
+        <div class="modal-full ingredient-picker-screen" id="ingredient-picker-modal">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <span class="status-icons"><img src="assets/icons/status-bar-right.svg" alt="" /></span>
+          </div>
+          <div class="ip-content">
+            <div class="ip-header-block">
+              <div class="ip-header-row">
+                <div class="ip-title-group">
+                  <button class="ip-close-btn" id="btn-close-ingredient-picker"><img src="assets/icons/x-large.svg" alt="Close" /></button>
+                  <p class="ip-title">Add Ingredient</p>
+                </div>
+                <button class="done-button" id="btn-done-ingredient-picker" aria-label="Done">
+                  <span class="done-button-circle"><img src="assets/icons/check.svg" alt="" /></span>
+                </button>
+              </div>
+              <div class="ip-search-bar">
+                <img src="assets/icons/search.svg" alt="" />
+                <input type="text" id="ip-search-input" placeholder="search" autocomplete="off" />
+              </div>
+              <div class="ip-filter-row">
+                <button class="filter-chip" data-chip="recent"><img class="chip-x" src="assets/icons/x-small.svg" alt="" />recently added</button>
+                <button class="filter-chip" data-chip="unit"><img class="chip-x" src="assets/icons/x-small.svg" alt="" />unit based</button>
+                <button class="filter-chip" data-chip="measurable"><img class="chip-x" src="assets/icons/x-small.svg" alt="" />measurement based</button>
+                <button class="filter-chip" data-chip="stock"><img class="chip-x" src="assets/icons/x-small.svg" alt="" />in-stock only</button>
+              </div>
+            </div>
+            <button class="ip-clear-selection" id="btn-clear-selection">clear selection</button>
+            <ul class="ip-list" id="ip-list"></ul>
+          </div>
+        </div>
+
+        <!-- ===== Hours to Make sheet (Frames 69-73) ===== -->
+        <div class="hours-sheet-backdrop" id="hours-sheet-backdrop">
+          <div class="hours-sheet">
+            <div class="hours-sheet-title-row">
+              <img src="assets/icons/info.svg" alt="" class="hours-sheet-info" />
+              <p class="hours-sheet-title">Hours to Make</p>
+              <button class="chevron-btn hours-sheet-close" id="btn-close-hours-sheet"><img src="assets/icons/x-med.svg" alt="Close" /></button>
+            </div>
+            <p class="hours-sheet-copy">Your hourly labor cost (optional). We'll multiply it by each product's build time to include labor in its cost. Change your default rate anytime in profile settings.</p>
+            <div class="hours-sheet-field">
+              <label>default hourly rate</label>
+              <div class="hours-sheet-input-row">
+                <span class="hs-dollar" id="hours-rate-dollar" hidden>$</span>
+                <input type="text" inputmode="decimal" id="hours-rate-input" placeholder="$USD" />
+                <span class="hs-unit" id="hours-rate-unit" hidden>USD</span>
+              </div>
+            </div>
+            <div class="hours-sheet-field">
+              <label>hours to make</label>
+              <div class="hours-sheet-input-row">
+                <input type="text" inputmode="decimal" id="hours-value-input" placeholder="hours" />
+                <span class="hs-unit" id="hours-value-unit" hidden>hours</span>
+              </div>
+            </div>
+            <button class="create-btn" id="btn-save-hours">Save</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
