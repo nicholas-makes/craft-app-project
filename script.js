@@ -801,7 +801,11 @@
   function sizeBareInput(input) {
     qtyMeasureCtx.font = "16px 'Poppins', sans-serif";
     var text = input.value || input.placeholder || '';
-    input.style.width = Math.ceil(qtyMeasureCtx.measureText(text).width + 1) + 'px';
+    // A larger buffer than sizeQtyInput's +1 -- this input has no padding
+    // of its own to absorb the gap between canvas measureText and the
+    // browser's actual text layout, so too tight a fit clips the last
+    // character (seen with e.g. "190" rendering as "19" cut off).
+    input.style.width = Math.ceil(qtyMeasureCtx.measureText(text).width + 4) + 'px';
   }
 
   function renderIngredientRow(v, vIndex, ing, ingIndex) {

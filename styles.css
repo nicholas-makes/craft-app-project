@@ -932,6 +932,11 @@ body {
 /* ================= Ingredient picker (full screen) ================= */
 .ingredient-picker-screen { z-index: 500; }
 
+/* clear-selection sits 4px above the list it clears (Figma: 44px row,
+   list starts at y=48) -- much tighter than the 20px rhythm used
+   between the other blocks in .ip-content, hence its own wrapper. */
+.ip-list-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px; width: 100%; }
+
 .ip-content {
   flex: 1;
   min-height: 0;
@@ -1207,7 +1212,11 @@ body {
 /* #page-plan itself stays the app's normal --color-bg-app (#f3efe8) --
    Figma only tints the top card group's own frame (bg-#dddecf); the
    sections frame below it is transparent, showing the page's own
-   #f3efe8 through, not a second flat color for the "bottom half". */
+   #f3efe8 through, not a second flat color for the "bottom half".
+   That #dddecf frame sits at y=0 same as the status bar, 62-852px tall,
+   so the olive tint runs full-bleed behind the status bar too -- only
+   the status bar's own icons/text sit on top of it, not a beige strip. */
+#page-plan .status-bar { background: #dddecf; }
 
 /* Figma node 288:3049: status bar (62) -> title (y=70) is an 8px gap, not
    the page's usual 14-16px top padding; title-block -> card -> card -> card
@@ -1310,6 +1319,10 @@ body {
 .pf-title { margin: 0; font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
 .pf-subtitle { margin: 0; font-size: 16px; color: var(--color-text-primary); }
 
+/* Figma node 303:3199: clear-selection's own 44px row is flush against
+   the list right below it -- 0 extra gap, unlike the 16px rhythm used
+   between the other blocks in .pf-step. */
+.pf-list-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0; width: 100%; }
 .pf-product-list { gap: 8px; }
 
 .pf-product-card {
