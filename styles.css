@@ -388,14 +388,20 @@ body {
 /* ---------- Modal: Add Name ---------- */
 /* Cancel/name/filters stay pinned; only .modal-add-scroll-area (everything
    from the hairline divider down) scrolls. */
+/* Not a uniform gap: cancel -> name-block and name-block -> divider are
+   both 22px (via margin-bottom on each), but the divider needs to sit
+   flush against .modal-add-scroll-area right after it -- it used to be
+   that scroll area's own first card's border-top, with zero gap. */
 .modal-content {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 0;
   padding: 0 16px;
 }
+.modal-content > .cancel-btn { margin-bottom: 22px; }
+.modal-content > .name-block { margin-bottom: 22px; }
 
 .modal-add-divider { border-top: 0.5px solid var(--color-divider); flex-shrink: 0; }
 
@@ -405,7 +411,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  padding: 22px 0 40px;
+  /* No top padding: the divider used to be the first card's own
+     border-top, sitting flush with zero gap after the filter row --
+     the card's own 10px padding is what created the small buffer
+     before its content, not an extra gap on top of that. */
+  padding: 0 0 40px;
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: none;
