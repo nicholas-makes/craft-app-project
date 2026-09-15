@@ -255,25 +255,37 @@
     listProducts.hidden = true;
   });
 
-  /* ---------------- bottom nav (Catalog + Plan are real pages; the rest are visual only) ---------------- */
+  /* ---------------- bottom nav (Catalog + Plan are real pages; Home/Analytics/
+     Profile aren't built out, so clicking them shows the selected state --
+     pill highlight and the actual selected icon graphic -- without navigating
+     anywhere, matching Figma's nav-bar component states for every icon.
+     Each page has its own copy of the nav-bar, so every update below applies
+     to all of them at once to keep them in sync when the page changes. */
   var pageCatalog = document.getElementById('page-catalog');
   var pagePlan = document.getElementById('page-plan');
 
+  function setActiveNav(navName) {
+    document.querySelectorAll('.nav-item').forEach(function (btn) {
+      var isActive = btn.dataset.nav === navName;
+      btn.classList.toggle('active', isActive);
+      var img = btn.querySelector('img');
+      img.src = 'assets/nav/' + btn.dataset.nav + (isActive ? '-selected.svg' : '-unselected.svg');
+    });
+  }
+
   document.querySelectorAll('.nav-item').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      if (btn.dataset.nav === 'catalog') {
+      var navName = btn.dataset.nav;
+      setActiveNav(navName);
+      if (navName === 'catalog') {
         pageCatalog.hidden = false;
         pagePlan.hidden = true;
-        return;
-      }
-      if (btn.dataset.nav === 'plan') {
+      } else if (navName === 'plan') {
         pageCatalog.hidden = true;
         pagePlan.hidden = false;
         renderPlanCardsTop();
-        return;
       }
-      document.querySelectorAll('.nav-item').forEach(function (b) { b.classList.remove('active'); });
-      btn.classList.add('active');
+      // Home/Analytics/Profile: no page to switch to, so the current one stays.
     });
   });
 
