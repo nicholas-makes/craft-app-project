@@ -1220,10 +1220,12 @@
           '<p class="pf-ingredient-have">You have ' + need.have + (need.unit === 'unit' ? '' : ' ' + unitLabel(need.unit)) + '</p>' +
         '</div>' +
         '<div class="pf-ingredient-input-row">' +
-          '<div class="icon-slot"><span class="pf-checkbox selected"></span></div>' +
-          '<div class="pf-need-box">' +
-            '<input type="text" inputmode="decimal" data-index="' + i + '" value="' + need.needMore + '" />' +
-            '<span class="pf-need-unit">more ' + unitLabel(need.unit) + '</span>' +
+          '<div class="pf-ingredient-left">' +
+            '<div class="icon-slot"><span class="pf-checkbox selected"></span></div>' +
+            '<div class="pf-need-box">' +
+              '<input type="text" inputmode="decimal" data-index="' + i + '" value="' + need.needMore + '" />' +
+              '<span class="pf-need-unit">more ' + unitLabel(need.unit) + '</span>' +
+            '</div>' +
           '</div>' +
           '<span class="pf-ingredient-cost">$' + cost.toFixed(2) + '</span>' +
         '</div>';

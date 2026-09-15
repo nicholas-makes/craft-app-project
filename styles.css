@@ -1429,7 +1429,14 @@ body {
 .pf-ingredient-head { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; width: 100%; }
 .pf-ingredient-name { margin: 0; font-size: 14px; font-weight: 500; color: var(--color-olive); }
 .pf-ingredient-have { margin: 0; font-size: 14px; font-weight: 500; color: var(--color-item-sub); }
+/* Figma (310:9639): the checkbox's 44px slot and the tan need-box sit
+   flush against each other on the left (need-box starts at x=44, right
+   where the slot ends) -- space-between on all three children instead
+   pushed the box toward the middle. Grouping them in their own flex
+   item (like .ie-left elsewhere) keeps that pair flush while the cost
+   still lands on the right via the row's own space-between. */
 .pf-ingredient-input-row { display: flex; align-items: center; justify-content: space-between; height: 44px; width: 100%; }
+.pf-ingredient-left { display: flex; align-items: center; }
 .pf-ingredient-input-row .icon-slot { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .pf-need-box {
   background: var(--color-input-bg);
