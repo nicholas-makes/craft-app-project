@@ -233,6 +233,7 @@
   enableDragScroll(document.getElementById('modal-add-scroll'));
   enableDragScroll(document.getElementById('pf-product-list'));
   enableDragScroll(document.getElementById('pf-ingredient-list'));
+  enableDragScroll(document.getElementById('plan-page-scroll'));
 
   /* ---------------- catalog: Products / Ingredients toggle ---------------- */
   var tabProducts = document.getElementById('tab-products');
