@@ -364,6 +364,11 @@
   nameInput.addEventListener('input', function () {
     nameInput.classList.toggle('filled', nameInput.value.trim().length > 0);
     updateCreateButton();
+    // updateCreateButton() only ever gates the Create Ingredient button --
+    // Create Product's readiness (which also depends on the name) is
+    // recomputed inside renderVariations(), which otherwise only runs on
+    // ingredient/hours changes, so typing a name alone never re-checked it.
+    renderVariations();
   });
 
   /* Product / Ingredient filter pills.
