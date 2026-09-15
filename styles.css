@@ -414,8 +414,13 @@ body {
   /* No top padding: the divider used to be the first card's own
      border-top, sitting flush with zero gap after the filter row --
      the card's own 10px padding is what created the small buffer
-     before its content, not an extra gap on top of that. */
-  padding: 0 0 40px;
+     before its content, not an extra gap on top of that.
+     Side padding + matching negative margin gives the footer buttons'
+     box-shadow room to render without changing the visible width --
+     overflow-y:auto clips the x-axis too, same as the filter-chip row
+     elsewhere, so a 0-padding edge cuts the shadow off flush. */
+  padding: 0 5px 40px;
+  margin: 0 -5px;
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: none;
