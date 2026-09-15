@@ -1153,6 +1153,7 @@
             pfSelected[p.name] = qtyInput.value;
             btnPfNext.classList.toggle('ready', pfHasValidSelection());
             btnPfNext.disabled = !pfHasValidSelection();
+            sizeQtyInput(qtyInput);
           });
           sizeQtyInput(qtyInput);
         }
