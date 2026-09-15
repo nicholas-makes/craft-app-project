@@ -789,23 +789,28 @@
   // sitting in a fixed-width box; a plain <input> won't auto-size to its
   // own value or placeholder, so measure it the same way a canvas-based
   // text-width check would and set the width explicitly.
-  var qtyMeasureCtx = document.createElement('canvas').getContext('2d');
+  // A canvas-measured font can race the @import'd Poppins web font: measure
+  // before it's loaded and you get a narrower fallback-font width baked into
+  // the input's style, which then clips once Poppins actually paints wider
+  // glyphs. A hidden span sized by the real DOM/CSS font pipeline can never
+  // be out of sync with the input sitting right next to it, since both go
+  // through the same font at the same time.
+  var measureSpan = document.createElement('span');
+  measureSpan.style.cssText = 'position:absolute; visibility:hidden; white-space:pre; top:-9999px; left:-9999px; font-family:"Poppins",sans-serif; font-size:16px;';
+  document.body.appendChild(measureSpan);
+  function measureTextWidth(text) {
+    measureSpan.textContent = text;
+    return measureSpan.getBoundingClientRect().width;
+  }
   function sizeQtyInput(input) {
-    qtyMeasureCtx.font = "16px 'Poppins', sans-serif";
     var text = input.value || input.placeholder || '';
-    var textWidth = qtyMeasureCtx.measureText(text).width;
-    input.style.width = (Math.ceil(textWidth) + 12 * 2 + 1) + 'px'; // + horizontal padding + border
+    input.style.width = (Math.ceil(measureTextWidth(text)) + 12 * 2 + 2) + 'px'; // + horizontal padding + border
   }
   // Same idea, but for an input with no padding/border of its own (e.g. one
   // sitting inside an already-padded box alongside a unit label).
   function sizeBareInput(input) {
-    qtyMeasureCtx.font = "16px 'Poppins', sans-serif";
     var text = input.value || input.placeholder || '';
-    // A larger buffer than sizeQtyInput's +1 -- this input has no padding
-    // of its own to absorb the gap between canvas measureText and the
-    // browser's actual text layout, so too tight a fit clips the last
-    // character (seen with e.g. "190" rendering as "19" cut off).
-    input.style.width = Math.ceil(qtyMeasureCtx.measureText(text).width + 4) + 'px';
+    input.style.width = Math.ceil(measureTextWidth(text) + 4) + 'px';
   }
 
   function renderIngredientRow(v, vIndex, ing, ingIndex) {
@@ -1268,10 +1273,10 @@
   function renderPlanCardsTop() {
     if (!lastPurchaseList) {
       planCardsTop.innerHTML =
-        '<div class="plan-card">' +
+        '<div class="plan-card plan-card-clickable" id="btn-open-plan-flow">' +
           '<div class="plan-card-header">' +
             '<p class="plan-card-title">Plan for future orders</p>' +
-            '<button class="plan-card-cta" id="btn-open-plan-flow"><span>Start</span><img src="assets/icons/arrow-right.svg" alt=""></button>' +
+            '<span class="plan-card-cta"><span>Start</span><img src="assets/icons/arrow-right.svg" alt=""></span>' +
           '</div>' +
           '<p class="plan-card-desc">Select what you\'re planning to make and we\'ll put a shopping list together for you.</p>' +
         '</div>';

@@ -1209,13 +1209,15 @@ body {
 
 /* ================= Plan tab + "Plan for future orders" flow ================= */
 
-/* #page-plan itself stays the app's normal --color-bg-app (#f3efe8) --
-   Figma only tints the top card group's own frame (bg-#dddecf); the
-   sections frame below it is transparent, showing the page's own
-   #f3efe8 through, not a second flat color for the "bottom half".
-   That #dddecf frame sits at y=0 same as the status bar, 62-852px tall,
-   so the olive tint runs full-bleed behind the status bar too -- only
-   the status bar's own icons/text sit on top of it, not a beige strip. */
+/* The rubber-band bounce translates .plan-page-content itself, which
+   momentarily uncovers whatever sits behind it -- #page-plan's own
+   background. Figma's top card-group frame is #dddecf full-bleed from
+   y=0 (behind the status bar too), so that's the page's base color;
+   the sections frame below it has no fill of its own in Figma (it just
+   shows the page through), which without this rule would now read as
+   olive instead of the intended #f3efe8 -- so it gets that painted on
+   explicitly instead of relying on inheriting the (now-olive) page bg. */
+#page-plan { background: #dddecf; }
 #page-plan .status-bar { background: #dddecf; }
 
 /* Figma node 288:3049: status bar (62) -> title (y=70) is an 8px gap, not
@@ -1241,7 +1243,7 @@ body {
   flex-shrink: 0;
   padding: 8px 16px 16px;
 }
-.plan-sections-group { display: flex; flex-direction: column; gap: 24px; width: 100%; flex-shrink: 0; padding: 0 16px 120px; }
+.plan-sections-group { display: flex; flex-direction: column; gap: 24px; width: 100%; flex-shrink: 0; padding: 0 16px 120px; background: var(--color-bg-app); }
 
 .plan-page-content .title-block { gap: 0; }
 .plan-page-content .page-title { font-size: 22px; }
@@ -1258,6 +1260,7 @@ body {
   width: 100%;
   flex-shrink: 0;
 }
+.plan-card-clickable { cursor: pointer; }
 
 .plan-card-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
 .plan-card-title { margin: 0; font-size: 16px; font-weight: 500; color: #252715; }
@@ -1376,7 +1379,11 @@ body {
 #pf-selection-lines { display: flex; flex-direction: column; gap: 4px; }
 .pf-selection-line { display: flex; align-items: center; gap: 12px; font-size: 16px; color: #6a6b5a; }
 
-.pf-need-caption { margin: 0; font-size: 14px; color: #4c4c4c; flex-shrink: 0; }
+/* Figma node 310:9655: the caption's own 44px row sits flush against the
+   ingredient list right below it -- 0 extra gap, the same clear-selection
+   pattern as .ip-list-wrap/.pf-list-wrap, not the step's usual 16px rhythm. */
+.pf-need-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0; width: 100%; }
+.pf-need-caption { margin: 0; height: 44px; display: flex; align-items: center; font-size: 14px; color: #4c4c4c; flex-shrink: 0; }
 
 .pf-ingredient-list {
   list-style: none;
