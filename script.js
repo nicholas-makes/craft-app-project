@@ -231,6 +231,8 @@
   enableDragScroll(document.getElementById('list-ingredients'));
   enableDragScroll(document.getElementById('unit-list'));
   enableDragScroll(document.getElementById('modal-add-scroll'));
+  enableDragScroll(document.getElementById('pf-product-list'));
+  enableDragScroll(document.getElementById('pf-ingredient-list'));
 
   /* ---------------- catalog: Products / Ingredients toggle ---------------- */
   var tabProducts = document.getElementById('tab-products');
@@ -252,10 +254,23 @@
     listProducts.hidden = true;
   });
 
-  /* ---------------- bottom nav (visual only outside Catalog) ---------------- */
+  /* ---------------- bottom nav (Catalog + Plan are real pages; the rest are visual only) ---------------- */
+  var pageCatalog = document.getElementById('page-catalog');
+  var pagePlan = document.getElementById('page-plan');
+
   document.querySelectorAll('.nav-item').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      if (btn.dataset.nav === 'catalog') return;
+      if (btn.dataset.nav === 'catalog') {
+        pageCatalog.hidden = false;
+        pagePlan.hidden = true;
+        return;
+      }
+      if (btn.dataset.nav === 'plan') {
+        pageCatalog.hidden = true;
+        pagePlan.hidden = false;
+        renderPlanCardsTop();
+        return;
+      }
       document.querySelectorAll('.nav-item').forEach(function (b) { b.classList.remove('active'); });
       btn.classList.add('active');
     });
@@ -780,6 +795,13 @@
     var textWidth = qtyMeasureCtx.measureText(text).width;
     input.style.width = (Math.ceil(textWidth) + 12 * 2 + 1) + 'px'; // + horizontal padding + border
   }
+  // Same idea, but for an input with no padding/border of its own (e.g. one
+  // sitting inside an already-padded box alongside a unit label).
+  function sizeBareInput(input) {
+    qtyMeasureCtx.font = "16px 'Poppins', sans-serif";
+    var text = input.value || input.placeholder || '';
+    input.style.width = Math.ceil(qtyMeasureCtx.measureText(text).width + 1) + 'px';
+  }
 
   function renderIngredientRow(v, vIndex, ing, ingIndex) {
     var row = document.createElement('div');
@@ -1013,5 +1035,256 @@
   });
 
   resetProductTab();
+
+  /* ================= Plan tab + "Plan for future orders" flow ================= */
+
+  // Recipes are invented (the app has no real product/ingredient linkage yet)
+  // but every quantity references a real, measurable INGREDIENT_CATALOG entry
+  // so the shortfall math below is genuine, not just Figma's example numbers.
+  var PRODUCT_CATALOG = [
+    { name: 'Messenger Bag', sub: 'Made to Order', tag: 'available', recipe: [
+      { ingredient: 'Blue Leather', qty: 3 }, { ingredient: 'Brass Rivets', qty: 6 }, { ingredient: 'Waxed Thread', qty: 5 }
+    ] },
+    { name: 'Vertical Wallet', sub: '7 in stock', tag: 'in-stock', recipe: [
+      { ingredient: 'Olive Green Leather', qty: 0.5 }, { ingredient: 'Waxed Thread', qty: 3 }, { ingredient: 'Brass Rivets', qty: 4 }
+    ] },
+    { name: 'Horizontal Wallet', sub: 'Made to Order', tag: 'at-risk', recipe: [
+      { ingredient: 'Olive Green Leather', qty: 0.6 }, { ingredient: 'Waxed Thread', qty: 2.5 }, { ingredient: 'Brass Rivets', qty: 4 }
+    ] },
+    { name: 'Passport Holder', sub: '0 in stock', tag: 'restock', recipe: [
+      { ingredient: 'Bright Green Leather', qty: 0.4 }, { ingredient: 'Brass Rivets', qty: 2 }, { ingredient: 'Waxed Thread', qty: 1.5 }
+    ] },
+    { name: 'Brass Keychain', sub: '7 in stock', tag: 'in-stock', recipe: [
+      { ingredient: 'Blue Leather', qty: 0.2 }, { ingredient: 'Brass Rivets', qty: 2 }
+    ] },
+    { name: 'Leather Tote Bag', sub: '3 in stock', tag: 'in-stock', recipe: [
+      { ingredient: 'Purple Leather', qty: 4 }, { ingredient: 'Rope', qty: 1 }, { ingredient: 'Waxed Thread', qty: 6 }
+    ] },
+    { name: 'Card Holder', sub: '15 in stock', tag: 'in-stock', recipe: [
+      { ingredient: 'Burgundy Leather', qty: 0.3 }, { ingredient: 'Waxed Thread', qty: 1 }
+    ] },
+    { name: 'Leather Belt', sub: 'Made to Order', tag: 'at-risk', recipe: [
+      { ingredient: 'Burgundy Leather', qty: 0.8 }, { ingredient: 'Contact Cement', qty: 0.5 }
+    ] },
+    { name: 'Zip Pouch', sub: '9 in stock', tag: 'in-stock', recipe: [
+      { ingredient: 'Purple Leather', qty: 0.5 }, { ingredient: 'Zipper Tape', qty: 1 }, { ingredient: 'Waxed Thread', qty: 1 }
+    ] }
+  ];
+
+  var PF_TAG_LABEL = { 'in-stock': 'In Stock', 'restock': 'Restock', 'available': 'Available', 'at-risk': 'At Risk' };
+  var PF_TAG_CLASS = { 'in-stock': 'neutral', 'restock': 'alert', 'available': 'neutral', 'at-risk': 'low' };
+
+  function unitLabel(unit) {
+    if (unit === 'sqft') return 'sq ft';
+    if (unit === 'unit') return 'units';
+    return unit;
+  }
+
+  var planCardsTop = document.getElementById('plan-cards-top');
+  var planFlowModal = document.getElementById('plan-flow-modal');
+  var pfStepSelect = document.getElementById('pf-step-select');
+  var pfStepEdit = document.getElementById('pf-step-edit');
+  var pfProductList = document.getElementById('pf-product-list');
+  var pfSearchInput = document.getElementById('pf-search-input');
+  var btnPfClearSelection = document.getElementById('btn-pf-clear-selection');
+  var btnPfNext = document.getElementById('btn-pf-next');
+  var pfSelectionLines = document.getElementById('pf-selection-lines');
+  var pfIngredientList = document.getElementById('pf-ingredient-list');
+  var btnPfEditSelection = document.getElementById('btn-pf-edit-selection');
+  var btnPfSave = document.getElementById('btn-pf-save');
+
+  var pfSelected = {}; // product name -> quantity (string, as typed)
+  var pfNeeds = [];    // computed on entering step 2: [{ingredient, unit, rate, needMore, isUnit}]
+  var lastPurchaseList = null; // {lines: [{name, qty}]} once saved
+
+  function pfOpen() {
+    pfSelected = {};
+    pfSearchInput.value = '';
+    pfRenderProductList();
+    pfStepEdit.hidden = true;
+    pfStepSelect.hidden = false;
+    planFlowModal.classList.add('open');
+  }
+
+  function pfClose() {
+    planFlowModal.classList.remove('open');
+  }
+
+  function pfRenderProductList() {
+    var query = pfSearchInput.value.trim().toLowerCase();
+    pfProductList.innerHTML = '';
+    PRODUCT_CATALOG.filter(function (p) { return !query || p.name.toLowerCase().indexOf(query) !== -1; })
+      .forEach(function (p) {
+        var isSelected = Object.prototype.hasOwnProperty.call(pfSelected, p.name);
+        var li = document.createElement('li');
+        li.className = 'pf-product-card' + (isSelected ? ' selected' : '');
+        var subClass = 'pf-product-sub' + (p.tag === 'restock' ? ' alert' : '');
+        li.innerHTML =
+          '<div class="pf-product-card-top">' +
+            '<div class="pf-product-card-left">' +
+              '<span class="pf-checkbox"></span>' +
+              '<div class="pf-product-text"><p class="pf-product-name">' + p.name + '</p><p class="' + subClass + '">' + p.sub + '</p></div>' +
+            '</div>' +
+            '<span class="status-tag ' + PF_TAG_CLASS[p.tag] + '">' + PF_TAG_LABEL[p.tag] + '</span>' +
+          '</div>' +
+          (isSelected ?
+            '<div class="pf-qty-row">' +
+              '<span class="icon-slot"><img src="assets/icons/number-pad.svg" alt=""></span>' +
+              '<input class="pf-qty-input" data-key="' + p.name + '" inputmode="numeric" value="' + pfSelected[p.name] + '" />' +
+            '</div>' : '');
+        li.querySelector('.pf-product-card-top').addEventListener('click', function () {
+          if (isSelected) { delete pfSelected[p.name]; } else { pfSelected[p.name] = '1'; }
+          pfRenderProductList();
+        });
+        var qtyInput = li.querySelector('.pf-qty-input');
+        if (qtyInput) {
+          qtyInput.addEventListener('click', function (e) { e.stopPropagation(); });
+          qtyInput.addEventListener('input', function () {
+            pfSelected[p.name] = qtyInput.value;
+            btnPfNext.classList.toggle('ready', pfHasValidSelection());
+            btnPfNext.disabled = !pfHasValidSelection();
+          });
+          sizeQtyInput(qtyInput);
+        }
+        pfProductList.appendChild(li);
+      });
+    btnPfNext.classList.toggle('ready', pfHasValidSelection());
+    btnPfNext.disabled = !pfHasValidSelection();
+  }
+
+  function pfHasValidSelection() {
+    var names = Object.keys(pfSelected);
+    if (names.length === 0) return false;
+    return names.every(function (n) { var q = parseFloat(pfSelected[n]); return !isNaN(q) && q > 0; });
+  }
+
+  function pfComputeNeeds() {
+    var totals = {}; // ingredient name -> total qty needed
+    Object.keys(pfSelected).forEach(function (productName) {
+      var qty = parseFloat(pfSelected[productName]);
+      if (isNaN(qty) || qty <= 0) return;
+      var product = PRODUCT_CATALOG.find(function (p) { return p.name === productName; });
+      if (!product) return;
+      product.recipe.forEach(function (line) {
+        totals[line.ingredient] = (totals[line.ingredient] || 0) + line.qty * qty;
+      });
+    });
+    var needs = [];
+    Object.keys(totals).forEach(function (ingName) {
+      var ing = INGREDIENT_CATALOG.find(function (i) { return i.name === ingName; });
+      if (!ing) return;
+      var have = parseFloat(ing.stock) || 0;
+      var shortfall = totals[ingName] - have;
+      if (shortfall <= 0) return;
+      needs.push({
+        ingredient: ingName,
+        unit: ing.unit,
+        rate: ing.rate,
+        have: have,
+        needMore: Math.round(shortfall * 100) / 100
+      });
+    });
+    return needs;
+  }
+
+  function pfRenderSelectionSummary() {
+    pfSelectionLines.innerHTML = '';
+    Object.keys(pfSelected).forEach(function (name) {
+      var line = document.createElement('div');
+      line.className = 'pf-selection-line';
+      line.innerHTML = '<span>' + name + ':</span><span>' + pfSelected[name] + '</span>';
+      pfSelectionLines.appendChild(line);
+    });
+  }
+
+  function pfRenderIngredientList() {
+    pfIngredientList.innerHTML = '';
+    pfNeeds.forEach(function (need, i) {
+      var li = document.createElement('li');
+      li.className = 'pf-ingredient-row';
+      var cost = need.needMore * need.rate;
+      li.innerHTML =
+        '<div class="pf-ingredient-head">' +
+          '<p class="pf-ingredient-name">' + need.ingredient + '</p>' +
+          '<p class="pf-ingredient-have">You have ' + need.have + (need.unit === 'unit' ? '' : ' ' + unitLabel(need.unit)) + '</p>' +
+        '</div>' +
+        '<div class="pf-ingredient-input-row">' +
+          '<div class="icon-slot"><span class="pf-checkbox selected"></span></div>' +
+          '<div class="pf-need-box">' +
+            '<input type="text" inputmode="decimal" data-index="' + i + '" value="' + need.needMore + '" />' +
+            '<span class="pf-need-unit">more ' + unitLabel(need.unit) + '</span>' +
+          '</div>' +
+          '<span class="pf-ingredient-cost">$' + cost.toFixed(2) + '</span>' +
+        '</div>';
+      var input = li.querySelector('input');
+      sizeBareInput(input);
+      input.addEventListener('input', function () {
+        var q = parseFloat(input.value);
+        need.needMore = isNaN(q) ? 0 : q;
+        li.querySelector('.pf-ingredient-cost').textContent = '$' + (need.needMore * need.rate).toFixed(2);
+        sizeBareInput(input);
+      });
+      pfIngredientList.appendChild(li);
+    });
+  }
+
+  btnPfNext.addEventListener('click', function () {
+    if (!btnPfNext.classList.contains('ready')) return;
+    pfNeeds = pfComputeNeeds();
+    pfRenderSelectionSummary();
+    pfRenderIngredientList();
+    pfStepSelect.hidden = true;
+    pfStepEdit.hidden = false;
+  });
+
+  btnPfEditSelection.addEventListener('click', function () {
+    pfRenderProductList();
+    pfStepEdit.hidden = true;
+    pfStepSelect.hidden = false;
+  });
+
+  btnPfSave.addEventListener('click', function () {
+    lastPurchaseList = {
+      lines: Object.keys(pfSelected).map(function (name) { return { name: name, qty: pfSelected[name] }; })
+    };
+    pfClose();
+    renderPlanCardsTop();
+  });
+
+  pfSearchInput.addEventListener('input', pfRenderProductList);
+  btnPfClearSelection.addEventListener('click', function () { pfSelected = {}; pfRenderProductList(); });
+  document.getElementById('btn-close-pf').addEventListener('click', pfClose);
+  document.getElementById('btn-close-pf-2').addEventListener('click', pfClose);
+
+  document.getElementById('plan-cards-top').addEventListener('click', function (e) {
+    if (e.target.closest('#btn-open-plan-flow')) pfOpen();
+  });
+
+  function renderPlanCardsTop() {
+    if (!lastPurchaseList) {
+      planCardsTop.innerHTML =
+        '<div class="plan-card">' +
+          '<div class="plan-card-header">' +
+            '<p class="plan-card-title">Plan for future orders</p>' +
+            '<button class="plan-card-cta" id="btn-open-plan-flow"><span>Start</span><img src="assets/icons/arrow-right.svg" alt=""></button>' +
+          '</div>' +
+          '<p class="plan-card-desc">Select what you\'re planning to make and we\'ll put a shopping list together for you.</p>' +
+        '</div>';
+    } else {
+      var lines = lastPurchaseList.lines.map(function (l) {
+        return '<div class="plan-card-line"><span>' + l.name + ':</span><span>' + l.qty + '</span></div>';
+      }).join('');
+      planCardsTop.innerHTML =
+        '<div class="plan-card">' +
+          '<div class="plan-card-header">' +
+            '<p class="plan-card-title">Last Purchase List</p>' +
+            '<span class="plan-card-cta"><span>View &amp; edit</span><img src="assets/icons/arrow-right.svg" alt=""></span>' +
+          '</div>' +
+          '<div class="plan-card-lines">' + lines + '</div>' +
+        '</div>';
+    }
+  }
+
+  renderPlanCardsTop();
 
 })();

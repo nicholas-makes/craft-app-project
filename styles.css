@@ -1201,3 +1201,196 @@ body {
   min-width: 0;
 }
 .hours-sheet-input-row input::placeholder { color: var(--color-text-muted-2); }
+
+/* ================= Plan tab + "Plan for future orders" flow ================= */
+
+#page-plan { background: #dddecf; }
+
+.plan-page-content { gap: 24px; padding: 16px 16px 16px; }
+
+.plan-page-content .title-block { gap: 0; }
+.plan-page-content .page-title { font-size: 22px; }
+.plan-page-content .page-subtitle { margin: 0; font-size: 16px; color: var(--color-text-primary); }
+
+.plan-card {
+  background: #f8f8f7;
+  border: 0.5px solid #7c822c;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.plan-card-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.plan-card-title { margin: 0; font-size: 16px; font-weight: 500; color: #252715; }
+.plan-card-cta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+.plan-card-cta span { font-size: 14px; font-weight: 500; color: var(--color-olive); }
+.plan-card-cta img { width: 12px; height: 10px; }
+.plan-card-desc { margin: 0; font-size: 14px; font-weight: 500; color: #99998d; }
+
+/* "Last Purchase List" state: same card, a couple of name/qty lines instead of the description */
+.plan-card-lines { display: flex; flex-direction: column; gap: 4px; }
+.plan-card-line { display: flex; align-items: center; gap: 12px; font-size: 16px; color: #6a6b5a; }
+.plan-card-line span:first-child { font-family: inherit; }
+
+.plan-section { display: flex; flex-direction: column; gap: 12px; width: 100%; flex-shrink: 0; }
+.plan-section-head { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.plan-section-title-row { display: flex; align-items: center; gap: 8px; }
+.plan-warning-icon { width: 16px; height: 14px; flex-shrink: 0; }
+.plan-section-title { margin: 0; font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+.plan-section-desc { margin: 0; font-size: 14px; color: #5f6058; }
+.plan-static-list { position: static; overflow: visible; padding: 0; gap: 8px; display: flex; flex-direction: column; }
+
+/* ---- "Plan for future orders" flow modal ---- */
+.pf-step {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 16px 40px;
+  background: #fff;
+}
+
+.pf-top-row { position: relative; display: flex; align-items: center; height: 44px; flex-shrink: 0; }
+
+.pf-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.pf-dot { width: 8px; height: 8px; border-radius: 4px; background: #d1d2c9; flex-shrink: 0; }
+.pf-dot.active { background: #1d1f03; }
+
+.pf-header { display: flex; flex-direction: column; gap: 0; flex-shrink: 0; }
+.pf-title { margin: 0; font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.pf-subtitle { margin: 0; font-size: 16px; color: var(--color-text-primary); }
+
+.pf-product-list { gap: 8px; }
+
+.pf-product-card {
+  background: var(--color-track-bg);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.pf-product-card-top { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.pf-product-card-left { display: flex; align-items: center; gap: 12px; }
+.pf-checkbox { width: 18px; height: 18px; border-radius: 4px; border: 1px solid #606c08; background: #fff; flex-shrink: 0; }
+.pf-product-card.selected .pf-checkbox,
+.pf-checkbox.selected { background: var(--color-olive); }
+.pf-product-text { display: flex; flex-direction: column; }
+.pf-product-name { margin: 0; font-size: 16px; color: var(--color-text-primary); }
+.pf-product-sub { margin: 0; font-size: 14px; font-weight: 500; color: var(--color-item-sub); }
+.pf-product-sub.alert { color: var(--color-item-sub-alert); }
+
+.pf-qty-row { display: flex; align-items: center; height: 44px; width: 100%; }
+.pf-qty-row .icon-slot img { width: 13px; height: 16px; }
+.pf-qty-input {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  border: 0.5px solid var(--color-input-border);
+  background: var(--color-input-bg);
+  border-radius: 10px;
+  padding: 6px 12px;
+  color: var(--color-input-text);
+  outline: none;
+  flex-shrink: 0;
+}
+
+.pf-selection-card {
+  background: var(--color-track-bg);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  flex-shrink: 0;
+}
+.pf-selection-head { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.pf-selection-title { margin: 0; font-size: 16px; color: var(--color-text-primary); }
+.pf-selection-head .chevron-btn img { width: 14px; height: 14px; }
+#pf-selection-lines { display: flex; flex-direction: column; gap: 4px; }
+.pf-selection-line { display: flex; align-items: center; gap: 12px; font-size: 16px; color: #6a6b5a; }
+
+.pf-need-caption { margin: 0; font-size: 14px; color: #4c4c4c; flex-shrink: 0; }
+
+.pf-ingredient-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: none;
+  scrollbar-width: none;
+}
+.pf-ingredient-list::-webkit-scrollbar { display: none; }
+
+.pf-ingredient-row {
+  background: var(--color-track-bg);
+  border-radius: 10px;
+  width: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 8px;
+}
+.pf-ingredient-head { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; width: 100%; }
+.pf-ingredient-name { margin: 0; font-size: 14px; font-weight: 500; color: var(--color-olive); }
+.pf-ingredient-have { margin: 0; font-size: 14px; font-weight: 500; color: var(--color-item-sub); }
+.pf-ingredient-input-row { display: flex; align-items: center; justify-content: space-between; height: 44px; width: 100%; }
+.pf-ingredient-input-row .icon-slot { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.pf-need-box {
+  background: var(--color-input-bg);
+  border: 0.5px solid var(--color-input-border);
+  border-radius: 10px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pf-need-box input {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-input-text);
+  flex-shrink: 0;
+  /* hugs its own digit count -- sized in JS via sizeQtyInput, like ie-qty-input */
+}
+.pf-need-unit { font-size: 16px; color: var(--color-text-muted-2); white-space: nowrap; }
+.pf-ingredient-cost { padding-right: 16px; font-size: 16px; color: var(--color-text-muted-2); }
+
+.pf-save-block { display: flex; flex-direction: column; gap: 8px; width: 100%; flex-shrink: 0; }
+.pf-save-caption { margin: 0; font-size: 14px; font-weight: 500; color: #84847f; text-align: center; width: 100%; }

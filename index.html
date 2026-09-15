@@ -189,6 +189,140 @@
         </nav>
       </div>
 
+      <!-- ============ PLAN PAGE (Flow 3) ============ -->
+      <div class="page" id="page-plan" hidden>
+        <div class="status-bar">
+          <span class="time">9:41</span>
+          <span class="status-icons"><img src="assets/icons/status-bar-right.svg" alt="" /></span>
+        </div>
+
+        <div class="page-content plan-page-content">
+          <div class="title-block">
+            <h1 class="page-title">Plan</h1>
+            <p class="page-subtitle">Strategize your crafting business like a pro.</p>
+          </div>
+
+          <div id="plan-cards-top"></div>
+
+          <div class="plan-card">
+            <div class="plan-card-header">
+              <p class="plan-card-title">Ready to make?</p>
+              <span class="plan-card-cta"><span>Start</span><img src="assets/icons/arrow-right.svg" alt="" /></span>
+            </div>
+            <p class="plan-card-desc">We&#39;ll help you round up all the ingredients you need so you can start creating faster.</p>
+          </div>
+
+          <div class="plan-card">
+            <div class="plan-card-header">
+              <p class="plan-card-title">Monitor Tool Usage</p>
+            </div>
+            <p class="plan-card-desc">Keep track of how your tools and equipment usage contribute to your cost of goods sold.</p>
+          </div>
+
+          <div class="plan-section">
+            <div class="plan-section-head">
+              <div class="plan-section-title-row">
+                <img src="assets/icons/warning.svg" alt="" class="plan-warning-icon" />
+                <p class="plan-section-title">Big Ingredient Users</p>
+              </div>
+              <p class="plan-section-desc">These products will take a large chunk of your ingredients in a single batch.</p>
+            </div>
+            <ul class="item-list plan-static-list">
+              <li class="item-card">
+                <div><p class="item-name">Vertical Wallet</p><p class="item-sub">7 in stock</p></div>
+                <span class="status-tag neutral">In Stock</span>
+              </li>
+              <li class="item-card">
+                <div><p class="item-name">Vertical Wallet</p><p class="item-sub">Made to Order</p></div>
+                <span class="status-tag neutral">Available</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="plan-section">
+            <p class="plan-section-title">Best Sellers at Risk of Low Stock</p>
+            <ul class="item-list plan-static-list">
+              <li class="item-card">
+                <div><p class="item-name">Vertical Wallet</p><p class="item-sub">4 in stock</p></div>
+                <span class="status-tag low">Low</span>
+              </li>
+              <li class="item-card">
+                <div><p class="item-name">Vertical Wallet</p><p class="item-sub">Made to Order</p></div>
+                <span class="status-tag alert">At Risk</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <nav class="bottom-nav">
+          <div class="nav-pill">
+            <button class="nav-item" data-nav="home"><img src="assets/nav/home-unselected.svg" alt="Home" /></button>
+            <button class="nav-item" data-nav="catalog"><img src="assets/nav/catalog-unselected.svg" alt="Catalog" /></button>
+            <button class="nav-item" data-nav="analytics"><img src="assets/nav/analytics-unselected.svg" alt="Analytics" /></button>
+            <button class="nav-item active" data-nav="plan"><img src="assets/nav/plan-selected.svg" alt="Plan" /></button>
+            <button class="nav-item" data-nav="profile"><img src="assets/nav/profile-unselected.svg" alt="Profile" /></button>
+          </div>
+        </nav>
+      </div>
+
+      <!-- ============ PLAN FOR FUTURE ORDERS FLOW (Flow 3) ============ -->
+      <div class="modal-full" id="plan-flow-modal">
+        <div class="status-bar">
+          <span class="time">9:41</span>
+          <span class="status-icons"><img src="assets/icons/status-bar-right.svg" alt="" /></span>
+        </div>
+
+        <!-- Step 1: select products -->
+        <div class="pf-step" id="pf-step-select">
+          <div class="pf-top-row">
+            <button class="ip-close-btn" id="btn-close-pf"><img src="assets/icons/x-large.svg" alt="Close" /></button>
+            <div class="pf-dots">
+              <span class="pf-dot active"></span>
+              <span class="pf-dot"></span>
+            </div>
+          </div>
+          <div class="pf-header">
+            <p class="pf-title">Plan for future orders</p>
+            <p class="pf-subtitle">First, select the products you&#39;re planning to make.</p>
+          </div>
+          <div class="ip-search-bar">
+            <img src="assets/icons/search.svg" alt="" />
+            <input type="text" id="pf-search-input" placeholder="search your products" autocomplete="off" />
+          </div>
+          <button class="ip-clear-selection" id="btn-pf-clear-selection">clear selection</button>
+          <ul class="ip-list pf-product-list" id="pf-product-list"></ul>
+          <button class="create-btn" id="btn-pf-next">Next</button>
+        </div>
+
+        <!-- Step 2: edit ingredient amounts -->
+        <div class="pf-step" id="pf-step-edit" hidden>
+          <div class="pf-top-row">
+            <button class="ip-close-btn" id="btn-close-pf-2"><img src="assets/icons/x-large.svg" alt="Close" /></button>
+            <div class="pf-dots">
+              <span class="pf-dot"></span>
+              <span class="pf-dot active"></span>
+            </div>
+          </div>
+          <div class="pf-header">
+            <p class="pf-title">Plan for future orders</p>
+            <p class="pf-subtitle">Now you can edit your ingredient list.</p>
+          </div>
+          <div class="pf-selection-card">
+            <div class="pf-selection-head">
+              <p class="pf-selection-title">Your Selection</p>
+              <button class="chevron-btn" id="btn-pf-edit-selection"><img src="assets/icons/pencil.svg" alt="Edit" /></button>
+            </div>
+            <div id="pf-selection-lines"></div>
+          </div>
+          <p class="pf-need-caption">This is how much more you need.</p>
+          <ul class="pf-ingredient-list" id="pf-ingredient-list"></ul>
+          <div class="pf-save-block">
+            <button class="create-btn ready" id="btn-pf-save">Save Purchase List</button>
+            <p class="pf-save-caption">We&#39;ll save this list to the Plan tab.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- ============ ADD NAME MODAL ============ -->
       <div class="modal-full" id="modal-add">
         <div class="status-bar">
