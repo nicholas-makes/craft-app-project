@@ -792,7 +792,9 @@ body {
 /* ---- variation block (one per "add variation" tap) ---- */
 .variation-block {
   background: #fff;
-  border-top: 0.5px solid var(--color-divider);
+  /* No border-top: that would double up with .modal-add-divider right
+     above the first one. border-bottom (plus the margin below) already
+     separates it from whatever variation comes after it. */
   border-bottom: 0.5px solid var(--color-divider);
   padding: 10px 0;
   display: flex;
