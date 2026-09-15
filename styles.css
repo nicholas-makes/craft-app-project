@@ -394,6 +394,8 @@ body {
   gap: 22px;
   padding: 0 16px 40px;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: none;
 }
 
 .cancel-btn {

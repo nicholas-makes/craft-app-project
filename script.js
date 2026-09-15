@@ -49,15 +49,21 @@
     cursorDot.classList.remove('pressing');
   });
 
-  /* ---------------- drag-to-scroll with momentum (no wheel scrolling) ----------------
+  /* ---------------- drag-to-scroll with momentum + rubber-band bounce (no wheel) ----
      Tuned to feel like native iOS momentum scrolling:
      - velocity is smoothed (EMA) across samples instead of taken from a single,
        possibly-noisy pointermove, so a flick doesn't feel jittery.
      - momentum decay is timestamp-based (not per-frame), so it plays back at the
        same speed regardless of display refresh rate.
-     - hitting the top/bottom eases the velocity out over a few frames instead of
-       hard-stopping, giving a soft cushion rather than an abrupt wall. */
+     - dragging (or flinging) past the top/bottom stretches the list via a
+       diminishing-return transform -- decoupled from the real scrollTop, which
+       stays clamped to [0, maxScroll] -- then springs back on release. Because
+       the stretch never depends on there being real scrollable range, a list
+       whose content doesn't overflow its box still bounces on every drag,
+       exactly like an empty/short list does natively on iOS. */
   var DRAG_THRESHOLD = 6; // px of movement before a press becomes a scroll-drag
+  var MAX_OVERSCROLL = 70; // px, cap on how far the rubber-band can stretch
+  var OVERSCROLL_RESISTANCE = 0.45; // fraction of past-the-edge drag that actually stretches
 
   function enableDragScroll(el) {
     var armed = false;   // pointer is down, but we haven't decided drag-vs-tap yet
@@ -70,6 +76,41 @@
     var velocity = 0; // px per ms
     var momentumId = null;
     var lastFrameT = 0;
+    var overscroll = 0; // px, visual-only stretch past the real scroll bounds
+    var springId = null;
+    var springLastT = 0;
+
+    function applyOverscroll() {
+      el.style.transform = overscroll ? 'translateY(' + overscroll.toFixed(2) + 'px)' : '';
+    }
+
+    function stopSpring() {
+      if (springId) {
+        cancelAnimationFrame(springId);
+        springId = null;
+      }
+    }
+
+    function springStep(t) {
+      var dt = springLastT ? Math.min(t - springLastT, 48) : 16.7;
+      springLastT = t;
+      overscroll *= Math.pow(0.05, dt / 200); // fast, smooth ease back to rest
+      if (Math.abs(overscroll) < 0.5) {
+        overscroll = 0;
+        applyOverscroll();
+        springId = null;
+        springLastT = 0;
+        return;
+      }
+      applyOverscroll();
+      springId = requestAnimationFrame(springStep);
+    }
+
+    function springBack() {
+      stopSpring();
+      springLastT = 0;
+      springId = requestAnimationFrame(springStep);
+    }
 
     function stopMomentum() {
       if (momentumId) {
@@ -85,29 +126,37 @@
       // Frame-rate independent exponential decay (~0.95 per 16.7ms frame).
       velocity *= Math.pow(0.95, dt / 16.7);
 
-      var maxScroll = el.scrollHeight - el.clientHeight;
+      var maxScroll = Math.max(0, el.scrollHeight - el.clientHeight);
       var next = el.scrollTop - velocity * dt;
 
       if (next < 0 || next > maxScroll) {
-        // Soft cushion at the edges instead of an abrupt stop.
-        next = next < 0 ? 0 : maxScroll;
-        velocity *= 0.6;
+        var excess = next < 0 ? -next : next - maxScroll;
+        overscroll = (next < 0 ? 1 : -1) * Math.min(excess * OVERSCROLL_RESISTANCE, MAX_OVERSCROLL);
+        applyOverscroll();
+        el.scrollTop = next < 0 ? 0 : maxScroll;
+        velocity *= 0.55;
+      } else {
+        el.scrollTop = next;
       }
-      el.scrollTop = next;
 
       if (Math.abs(velocity) < 0.02) {
         momentumId = null;
         lastFrameT = 0;
+        if (overscroll) springBack();
         return;
       }
       momentumId = requestAnimationFrame(runMomentum);
     }
 
     el.addEventListener('pointerdown', function (e) {
+      // Let a click-drag inside a text field select text normally instead of
+      // hijacking it as a scroll gesture.
+      if (e.target.closest('input, textarea')) return;
       armed = true;
       dragging = false;
       pointerId = e.pointerId;
       stopMomentum();
+      stopSpring();
       startY = e.clientY;
       lastY = e.clientY;
       lastT = performance.now();
@@ -130,7 +179,20 @@
       }
 
       var now = performance.now();
-      el.scrollTop = startScrollTop - delta;
+      var maxScroll = Math.max(0, el.scrollHeight - el.clientHeight);
+      var target = startScrollTop - delta;
+
+      if (target < 0) {
+        el.scrollTop = 0;
+        overscroll = Math.min(-target * OVERSCROLL_RESISTANCE, MAX_OVERSCROLL);
+      } else if (target > maxScroll) {
+        el.scrollTop = maxScroll;
+        overscroll = -Math.min((target - maxScroll) * OVERSCROLL_RESISTANCE, MAX_OVERSCROLL);
+      } else {
+        el.scrollTop = target;
+        overscroll = 0;
+      }
+      applyOverscroll();
 
       var dt = now - lastT;
       if (dt > 0) {
@@ -147,6 +209,11 @@
       if (!dragging) return;
       dragging = false;
       document.body.classList.remove('dragging-scroll');
+      if (overscroll) {
+        // Already stretched past the edge -- spring back rather than fling.
+        springBack();
+        return;
+      }
       if (Math.abs(velocity) > 0.03) {
         lastFrameT = 0;
         momentumId = requestAnimationFrame(runMomentum);
@@ -163,6 +230,7 @@
   enableDragScroll(document.getElementById('list-products'));
   enableDragScroll(document.getElementById('list-ingredients'));
   enableDragScroll(document.getElementById('unit-list'));
+  enableDragScroll(document.getElementById('modal-add-scroll'));
 
   /* ---------------- catalog: Products / Ingredients toggle ---------------- */
   var tabProducts = document.getElementById('tab-products');
@@ -593,10 +661,11 @@
   }
 
   function variationReady(v) {
+    // Hours to Make (and its hourly rate) are explicitly optional -- the
+    // sheet's own copy says so -- so they must not gate the Create Product
+    // button. Only every ingredient needing a resolved quantity/price does.
     if (v.ingredients.length === 0) return false;
-    var allQtyOk = v.ingredients.every(function (ing) { return lineTotal(ing) !== null; });
-    var hoursOk = v.hours !== null && v.hours > 0 && v.rate !== null && v.rate > 0;
-    return allQtyOk && hoursOk;
+    return v.ingredients.every(function (ing) { return lineTotal(ing) !== null; });
   }
 
   function renderVariations() {
@@ -701,7 +770,7 @@
       row.className = 'ingredient-editable flat';
       row.innerHTML =
         '<div class="ie-left">' +
-          '<button class="ie-remove"><img src="assets/icons/x-small.svg" alt=""></button>' +
+          '<button class="ie-remove"><img src="assets/icons/x-small-dark.svg" alt=""></button>' +
           '<p class="ie-name">' + ing.name + '</p>' +
         '</div>' +
         '<p class="ie-line-total">$' + ing.flatPrice.toFixed(2) + '</p>';
@@ -717,7 +786,7 @@
         '</div>' +
         '<div class="ie-input-row">' +
           '<div class="ie-left">' +
-            '<button class="ie-remove"><img src="assets/icons/x-small.svg" alt=""></button>' +
+            '<button class="ie-remove"><img src="assets/icons/x-small-dark.svg" alt=""></button>' +
             '<input class="ie-qty-input" data-key="' + dataKey + '" inputmode="decimal" placeholder="' + qtyPlaceholder + '" value="' + (ing.quantity || '') + '" />' +
           '</div>' +
           '<span class="ie-line-total">' + (total !== null ? '$' + total.toFixed(2) : '..') + '</span>' +
