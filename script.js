@@ -764,6 +764,18 @@
     btnCreateProduct.disabled = !allReady;
   }
 
+  // Figma's qty/hours inputs hug whatever text they're showing rather than
+  // sitting in a fixed-width box; a plain <input> won't auto-size to its
+  // own value or placeholder, so measure it the same way a canvas-based
+  // text-width check would and set the width explicitly.
+  var qtyMeasureCtx = document.createElement('canvas').getContext('2d');
+  function sizeQtyInput(input) {
+    qtyMeasureCtx.font = "16px 'Poppins', sans-serif";
+    var text = input.value || input.placeholder || '';
+    var textWidth = qtyMeasureCtx.measureText(text).width;
+    input.style.width = (Math.ceil(textWidth) + 12 * 2 + 1) + 'px'; // + horizontal padding + border
+  }
+
   function renderIngredientRow(v, vIndex, ing, ingIndex) {
     var row = document.createElement('div');
     if (ing.type === 'unit') {
@@ -792,6 +804,7 @@
           '<span class="ie-line-total">' + (total !== null ? '$' + total.toFixed(2) : '..') + '</span>' +
         '</div>';
       var qtyInput = row.querySelector('.ie-qty-input');
+      sizeQtyInput(qtyInput);
       qtyInput.addEventListener('input', function () {
         ing.quantity = qtyInput.value;
         renderVariations();

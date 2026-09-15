@@ -396,7 +396,9 @@ body {
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: none;
+  scrollbar-width: none;
 }
+.modal-content::-webkit-scrollbar { display: none; }
 
 .cancel-btn {
   /* Figma's Cancel row uses items-start on its parent column, so the
@@ -661,7 +663,11 @@ body {
   height: 75%;
   background: #fff;
   border-radius: 24px 24px 0 0;
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+  /* No shadow by default: translateY(100%) always leaves this element's
+     top edge flush with the screen's own bottom edge (moving a bottom:0
+     box down by its own height just relocates its top to where its
+     bottom used to be), so an always-on upward shadow bled into the
+     visible screen along the very bottom edge even while "closed". */
   transform: translateY(100%);
   transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
   z-index: 300;
@@ -670,7 +676,10 @@ body {
   padding: 18px 16px 24px;
 }
 
-.unit-picker.open { transform: translateY(0); }
+.unit-picker.open {
+  transform: translateY(0);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+}
 
 .unit-picker .close-x {
   width: 44px;
@@ -858,9 +867,10 @@ body {
   padding: 6px 12px;
   color: var(--color-input-text);
   outline: none;
-  /* 120px clipped "add quantity" to "add quantit" -- widened to comfortably
-     fit the longest placeholder used here. */
-  width: 165px;
+  flex-shrink: 0;
+  /* Figma hugs whatever text is showing (placeholder or value) instead of
+     a fixed box -- width is measured and set in JS (see sizeQtyInput)
+     since a plain <input> doesn't auto-size to its own content. */
 }
 .ie-qty-input::placeholder { color: var(--color-text-placeholder); }
 
@@ -891,8 +901,8 @@ body {
   border-radius: 10px;
   padding: 6px 12px;
   color: var(--color-text-placeholder);
-  width: 195px;
   cursor: pointer;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 10px;
