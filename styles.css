@@ -1385,7 +1385,26 @@ body {
 /* Figma node 310:9655: the caption's own 44px row sits flush against the
    ingredient list right below it -- 0 extra gap, the same clear-selection
    pattern as .ip-list-wrap/.pf-list-wrap, not the step's usual 16px rhythm. */
-.pf-need-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0; width: 100%; }
+/* Step 2's "Your Selection" card, the caption, and the ingredient list
+   all scroll together as one region -- only the X/dots and the title
+   block above stay pinned. Only this wrapper scrolls now; the pieces
+   inside it (.pf-selection-card, .pf-need-wrap, .pf-ingredient-list)
+   just flow at their natural height like any other stacked block. */
+.pf-step2-scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: none;
+  scrollbar-width: none;
+}
+.pf-step2-scroll::-webkit-scrollbar { display: none; }
+
+.pf-need-wrap { display: flex; flex-direction: column; gap: 0; width: 100%; flex-shrink: 0; }
 .pf-need-caption { margin: 0; height: 44px; display: flex; align-items: center; font-size: 14px; color: #4c4c4c; flex-shrink: 0; }
 
 .pf-ingredient-list {
@@ -1395,14 +1414,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  touch-action: none;
-  scrollbar-width: none;
 }
-.pf-ingredient-list::-webkit-scrollbar { display: none; }
 
 .pf-ingredient-row {
   background: var(--color-track-bg);
