@@ -1206,7 +1206,14 @@ body {
 
 #page-plan { background: #dddecf; }
 
-.plan-page-content { gap: 24px; padding: 16px 16px 16px; }
+/* Figma node 288:3049: status bar (62) -> title (y=70) is an 8px gap, not
+   the page's usual 14-16px top padding; title-block -> card -> card -> card
+   is a 12px rhythm; then a 32px gap (16px bottom padding closing the card
+   group's own frame + 16px top padding opening the sections frame below it)
+   before the two page-bottom sections, which are themselves 24px apart. */
+.plan-page-content { gap: 32px; padding: 8px 16px 0; }
+.plan-top-group { display: flex; flex-direction: column; gap: 12px; width: 100%; flex-shrink: 0; }
+.plan-sections-group { display: flex; flex-direction: column; gap: 24px; width: 100%; flex-shrink: 0; }
 
 .plan-page-content .title-block { gap: 0; }
 .plan-page-content .page-title { font-size: 22px; }
@@ -1251,7 +1258,7 @@ body {
 .plan-warning-icon { width: 16px; height: 14px; flex-shrink: 0; }
 .plan-section-title { margin: 0; font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
 .plan-section-desc { margin: 0; font-size: 14px; color: #5f6058; }
-.plan-static-list { position: static; overflow: visible; padding: 0; gap: 8px; display: flex; flex-direction: column; }
+.plan-static-list { position: static; overflow: visible; padding: 0; gap: 12px; display: flex; flex-direction: column; }
 
 /* ---- "Plan for future orders" flow modal ---- */
 .pf-step {
