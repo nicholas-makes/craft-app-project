@@ -310,10 +310,13 @@
   var unitRow = document.getElementById('unit-row');
   var unitField = document.getElementById('unit-field');
   var totalField = document.getElementById('total-field');
+  var totalSuffix = document.getElementById('total-suffix');
   var amountRow = document.getElementById('amount-row');
   var amountField = document.getElementById('amount-field');
+  var amountSuffix = document.getElementById('amount-suffix');
   var roughRow = document.getElementById('rough-row');
   var roughField = document.getElementById('rough-field');
+  var roughSuffix = document.getElementById('rough-suffix');
   var bufferRow = document.getElementById('buffer-row');
   var bufferField = document.getElementById('buffer-field');
   var unitCountField = document.getElementById('unit-count-field');
@@ -364,8 +367,13 @@
     unitField.placeholder = 'I want to measure by';
     unitRow.classList.remove('chosen');
     totalField.value = '';
+    totalSuffix.hidden = true;
     amountField.value = '';
+    amountField.placeholder = 'Amount I have';
+    amountSuffix.hidden = true;
+    amountSuffix.textContent = '';
     roughField.value = '';
+    roughSuffix.hidden = true;
     bufferField.value = '10';
     amountRow.hidden = true;
     roughRow.hidden = true;
@@ -488,6 +496,9 @@
       roughRow.hidden = true;
       amountRow.hidden = false;
       bufferRow.hidden = false;
+      amountField.placeholder = 'How many ' + unit + ' I have';
+      amountSuffix.textContent = unit;
+      sizeQtyInput(amountField);
       costLabel.textContent = 'Cost per ' + unit;
     }
 
@@ -535,8 +546,22 @@
     });
   });
 
+  // Figma 286:5495/269:1507: once a value is entered, these fields pick up
+  // an accessory suffix (unit/USD) the same way the Create Product flow's
+  // quantity inputs do.
+  totalField.addEventListener('input', function () {
+    totalSuffix.hidden = totalField.value.trim().length === 0;
+  });
+  amountField.addEventListener('input', function () {
+    amountSuffix.hidden = amountField.value.trim().length === 0;
+  });
+  roughField.addEventListener('input', function () {
+    roughSuffix.hidden = roughField.value.trim().length === 0;
+  });
+
   function updateCreateButton() {
     var ready = false;
+    var readyButForName = false;
     if (!ingredientTabContent.hidden && state.itemType === 'measurable') {
       var hasName = nameInput.value.trim().length > 0;
       var hasUnit = !!state.unit;
@@ -550,10 +575,14 @@
         var amount = parseFloat(amountField.value);
         branchOk = !isNaN(amount) && amount > 0;
       }
-      ready = hasName && hasUnit && hasTotal && branchOk;
+      readyButForName = hasUnit && hasTotal && branchOk;
+      ready = hasName && readyButForName;
     }
     btnCreate.classList.toggle('ready', ready);
     btnCreate.disabled = !ready;
+    // Everything but the name is filled in -- nudge the user toward what's
+    // actually missing instead of leaving a silently-disabled button.
+    btnCreate.textContent = (!ready && readyButForName) ? 'enter a name' : 'Create Ingredient';
   }
 
   /* functional scrollbar thumb for unit list */
@@ -800,9 +829,13 @@
     var anyIngredients = productVariations.some(function (v) { return v.ingredients.length > 0; });
     productFooter.hidden = !anyIngredients;
 
-    var allReady = anyIngredients && productVariations.every(variationReady) && nameInput.value.trim().length > 0;
+    var readyButForName = anyIngredients && productVariations.every(variationReady);
+    var allReady = readyButForName && nameInput.value.trim().length > 0;
     btnCreateProduct.classList.toggle('ready', allReady);
     btnCreateProduct.disabled = !allReady;
+    // Everything but the name is filled in -- nudge the user toward what's
+    // actually missing instead of leaving a silently-disabled button.
+    btnCreateProduct.textContent = (!allReady && readyButForName) ? 'enter a name' : 'Create Product';
   }
 
   // Figma's qty/hours inputs hug whatever text they're showing rather than
