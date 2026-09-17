@@ -721,7 +721,7 @@ body {
   bottom: 0;
   height: 75%;
   background: #fff;
-  border-radius: 24px 24px 0 0;
+  border-radius: 20px 20px 0 0;
   /* No shadow by default: translateY(100%) always leaves this element's
      top edge flush with the screen's own bottom edge (moving a bottom:0
      box down by its own height just relocates its top to where its
@@ -732,7 +732,8 @@ body {
   z-index: 300;
   display: flex;
   flex-direction: column;
-  padding: 18px 16px 24px;
+  gap: 8px;
+  padding: 16px 16px 30px;
 }
 
 .unit-picker.open {
@@ -740,7 +741,23 @@ body {
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
 }
 
+/* Figma 267:1039/2001:3623: title centered in its own 44px row, close
+   button absolutely pinned to the left edge of that row. */
+.unit-picker-header {
+  position: relative;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.unit-picker-title { margin: 0; font-size: 18px; font-weight: 400; color: var(--color-text-primary); }
+
 .unit-picker .close-x {
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 44px;
   height: 44px;
   display: flex;
@@ -749,28 +766,31 @@ body {
   border: none;
   background: none;
   cursor: pointer;
-  margin-bottom: 4px;
 }
 .unit-picker .close-x img { width: 16px; height: 16px; }
 
+/* Figma 267:1043: the scroll area itself carries the bottom corner radius
+   (the sheet only rounds its own top), and stretches full width -- the
+   scroll indicator overlays on top instead of taking up its own column. */
 .unit-list-wrap {
   flex: 1;
   min-height: 0;
-  display: flex;
   position: relative;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
 }
 
 .unit-list {
   list-style: none;
   margin: 0;
-  padding: 0 14px 0 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -781,10 +801,12 @@ body {
 .unit-option {
   background: #f7f7f7;
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 10px 14px;
   font-size: 16px;
   color: var(--color-text-primary);
   cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .unit-option:active { background: #ececec; }
@@ -793,9 +815,10 @@ body {
   width: 3px;
   border-radius: 2px;
   background: var(--color-scrollbar-track);
-  flex-shrink: 0;
-  position: relative;
-  margin-left: 4px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 4px;
 }
 
 .scrollbar-thumb {
