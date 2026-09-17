@@ -612,7 +612,9 @@ body {
   padding: 6px 12px;
   color: var(--color-input-text);
   outline: none;
-  width: 195px;
+  /* Figma 269:1507: these hug whatever text they're showing rather than
+     sitting in a fixed-width box -- sized in JS (see sizeQtyInput), same
+     as the Create Product flow's quantity inputs. */
 }
 
 .field-input::placeholder { color: var(--color-text-placeholder); }
@@ -932,6 +934,9 @@ body {
   color: var(--color-text-muted-2);
   padding-right: 16px;
 }
+/* Figma 286:5495/286:5404: once the row resolves to a real line total
+   (quantity entered), the $ amount switches from muted to --color-olive. */
+.ie-line-total.has-value { color: var(--color-olive); }
 
 /* ---- ingredient-editable: unit type (flat, no quantity) ---- */
 .ingredient-editable.flat {
@@ -1023,7 +1028,9 @@ body {
   width: 100%;
 }
 
-.ip-title-group { display: flex; align-items: center; gap: 10px; }
+/* Figma 2001:3689: the title/subtitle sit in their own block below the
+   close/done row, not inline with those buttons. */
+.ip-title-block { display: flex; flex-direction: column; gap: 4px; }
 .ip-title { font-size: 20px; color: var(--color-text-primary); margin: 0; font-weight: 400; }
 .ip-subtitle { margin: 0; font-size: 16px; color: var(--color-text-primary); }
 

@@ -394,11 +394,11 @@
               <div class="options-fields" id="unit-fields" hidden>
                 <div class="field-row" id="unit-count-row">
                   <span class="icon-slot"><img src="assets/icons/number-pad.svg" alt="" /></span>
-                  <input class="field-input" placeholder="Add Unit Count" disabled />
+                  <input class="field-input" id="unit-count-field" placeholder="Add Unit Count" disabled />
                 </div>
                 <div class="field-row">
                   <span class="icon-slot"><img src="assets/icons/dollar-amount.svg" alt="" /></span>
-                  <input class="field-input" placeholder="Amount I paid" disabled />
+                  <input class="field-input" id="unit-paid-field" placeholder="Amount I paid" disabled />
                 </div>
                 <div class="cost-display">
                   <span class="cost-label">Cost per unit</span>
@@ -438,7 +438,7 @@
 
                 <div class="field-row" id="rough-row" hidden>
                   <span class="icon-slot"><img src="assets/icons/number-pad.svg" alt="" /></span>
-                  <input class="field-input" id="rough-field" placeholder="Rough Amount of Uses" inputmode="decimal" />
+                  <input class="field-input" id="rough-field" placeholder="How many uses I want" inputmode="decimal" />
                 </div>
 
                 <div class="field-row buffer-row" id="buffer-row" hidden>
@@ -494,15 +494,15 @@
           <div class="ip-content">
             <div class="ip-header-block">
               <div class="ip-header-row">
-                <div class="ip-title-group">
-                  <button class="ip-close-btn" id="btn-close-ingredient-picker"><img src="assets/icons/x-large.svg" alt="Close" /></button>
-                  <p class="ip-title">Select Ingredients</p>
-                </div>
+                <button class="ip-close-btn" id="btn-close-ingredient-picker"><img src="assets/icons/x-large.svg" alt="Close" /></button>
                 <button class="done-button" id="btn-done-ingredient-picker" aria-label="Done">
                   <span class="done-button-circle"><img src="assets/icons/check.svg" alt="" /></span>
                 </button>
               </div>
-              <p class="ip-subtitle">Pick everything you need to make this new product.</p>
+              <div class="ip-title-block">
+                <p class="ip-title">Select Ingredients</p>
+                <p class="ip-subtitle">Pick everything you need to make this new product.</p>
+              </div>
               <div class="ip-search-bar">
                 <img src="assets/icons/search.svg" alt="" />
                 <input type="text" id="ip-search-input" placeholder="search" autocomplete="off" />

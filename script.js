@@ -316,6 +316,8 @@
   var roughField = document.getElementById('rough-field');
   var bufferRow = document.getElementById('buffer-row');
   var bufferField = document.getElementById('buffer-field');
+  var unitCountField = document.getElementById('unit-count-field');
+  var unitPaidField = document.getElementById('unit-paid-field');
   var costLabel = document.getElementById('cost-label');
   var costValue = document.getElementById('cost-value');
   var btnCreate = document.getElementById('btn-create');
@@ -371,6 +373,10 @@
     costLabel.textContent = 'Cost per..';
     costValue.textContent = '$';
     costValue.classList.remove('has-value');
+
+    // Figma 269:1507: these fields hug their placeholder/value width rather
+    // than sitting in a fixed box, same as the Create Product flow.
+    [unitField, totalField, amountField, roughField, bufferField, unitCountField, unitPaidField].forEach(sizeQtyInput);
 
     updateCreateButton();
     resetProductTab();
@@ -471,6 +477,7 @@
 
     unitField.value = unit === 'uses' ? 'Uses' : unit;
     unitRow.classList.add('chosen');
+    sizeQtyInput(unitField);
 
     if (state.branch === 'rough') {
       amountRow.hidden = true;
@@ -522,6 +529,7 @@
 
   [totalField, amountField, roughField, bufferField].forEach(function (el) {
     el.addEventListener('input', function () {
+      sizeQtyInput(el);
       recalcCost();
       updateCreateButton();
     });
@@ -839,7 +847,7 @@
       var total = lineTotal(ing);
       row.className = 'ingredient-editable';
       var dataKey = 'v' + vIndex + '-i' + ingIndex;
-      var qtyPlaceholder = ing.unit === 'unit' ? 'add units' : 'add quantity';
+      var qtyPlaceholder = 'how many ' + unitLabel(ing.unit);
       var hasQty = ing.quantity && String(ing.quantity).trim().length > 0;
       row.innerHTML =
         '<div class="ie-header">' +
@@ -854,7 +862,7 @@
               (hasQty ? '<span class="ie-qty-suffix">' + unitLabel(ing.unit) + '</span>' : '') +
             '</div>' +
           '</div>' +
-          '<span class="ie-line-total">' + (total !== null ? '$' + total.toFixed(2) : '..') + '</span>' +
+          '<span class="ie-line-total' + (total !== null ? ' has-value' : '') + '">' + (total !== null ? '$' + total.toFixed(2) : '..') + '</span>' +
         '</div>';
       var qtyInput = row.querySelector('.ie-qty-input');
       sizeBareInput(qtyInput);
