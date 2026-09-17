@@ -740,7 +740,7 @@
       addRow.innerHTML =
         '<div class="row-left">' +
           '<span class="icon-slot"><img src="assets/icons/add.svg" alt=""></span>' +
-          '<span>Add Ingredient</span>' +
+          '<span>Add Ingredients</span>' +
         '</div>' +
         '<button class="chevron-btn"><img src="assets/icons/caret-right.svg" alt=""></button>';
       addRow.addEventListener('click', function () { openIngredientPicker(vIndex); });

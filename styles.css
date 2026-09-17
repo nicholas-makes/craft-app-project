@@ -557,6 +557,11 @@ body {
 .radio-text .radio-title { font-size: 16px; color: var(--color-text-primary); }
 .radio-text .radio-sub { font-size: 14px; color: var(--color-text-muted); font-weight: 500; }
 
+/* Figma 275:1265: a trailing info icon in its own 44px min-clickable-container,
+   vertically inset to match the radio-box on the opposite end. It's decorative
+   only -- no click behavior -- so no button/cursor styling here. */
+.radio-info { flex-shrink: 0; margin: 5px 0; }
+
 /* An option-slot holds one radio header (Unit Item / Measurable Item).
    Unselected: plain row, no background. Selected: the header and its
    fields share one #fafafa rounded box, header gets 20px bottom padding
@@ -1007,6 +1012,7 @@ body {
 
 .ip-title-group { display: flex; align-items: center; gap: 10px; }
 .ip-title { font-size: 20px; color: var(--color-text-primary); margin: 0; font-weight: 400; }
+.ip-subtitle { margin: 0; font-size: 16px; color: var(--color-text-primary); }
 
 .done-button {
   width: 44px;

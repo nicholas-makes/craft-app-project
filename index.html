@@ -362,7 +362,7 @@
               <div class="simple-row" id="product-add-ingredient-empty">
                 <div class="row-left">
                   <span class="icon-slot"><img src="assets/icons/add.svg" alt="" /></span>
-                  <span>Add Ingredient</span>
+                  <span>Add Ingredients</span>
                 </div>
                 <button class="chevron-btn"><img src="assets/icons/caret-right.svg" alt="" /></button>
               </div>
@@ -389,6 +389,7 @@
                   <span class="radio-title">Unit Item</span>
                   <span class="radio-sub">Ingredient is countable, 5 buckles</span>
                 </div>
+                <span class="icon-slot radio-info"><img src="assets/icons/info.svg" alt="" /></span>
               </div>
               <div class="options-fields" id="unit-fields" hidden>
                 <div class="field-row" id="unit-count-row">
@@ -397,7 +398,7 @@
                 </div>
                 <div class="field-row">
                   <span class="icon-slot"><img src="assets/icons/dollar-amount.svg" alt="" /></span>
-                  <input class="field-input" placeholder="Amount You Paid" disabled />
+                  <input class="field-input" placeholder="Amount I paid" disabled />
                 </div>
                 <div class="cost-display">
                   <span class="cost-label">Cost per unit</span>
@@ -415,6 +416,7 @@
                   <span class="radio-title">Measurable Item</span>
                   <span class="radio-sub">Ingredient is measurable, 5 ft of thread</span>
                 </div>
+                <span class="icon-slot radio-info"><img src="assets/icons/info.svg" alt="" /></span>
               </div>
               <div class="options-fields" id="measurable-fields" hidden>
                 <div class="field-row unit-row" id="unit-row">
@@ -426,7 +428,7 @@
 
                 <div class="field-row" id="total-row">
                   <span class="icon-slot"><img src="assets/icons/dollar-amount.svg" alt="" /></span>
-                  <input class="field-input" id="total-field" placeholder="Amount You Paid" inputmode="decimal" />
+                  <input class="field-input" id="total-field" placeholder="Amount I paid" inputmode="decimal" />
                 </div>
 
                 <div class="field-row" id="amount-row" hidden>
@@ -494,12 +496,13 @@
               <div class="ip-header-row">
                 <div class="ip-title-group">
                   <button class="ip-close-btn" id="btn-close-ingredient-picker"><img src="assets/icons/x-large.svg" alt="Close" /></button>
-                  <p class="ip-title">Add Ingredient</p>
+                  <p class="ip-title">Select Ingredients</p>
                 </div>
                 <button class="done-button" id="btn-done-ingredient-picker" aria-label="Done">
                   <span class="done-button-circle"><img src="assets/icons/check.svg" alt="" /></span>
                 </button>
               </div>
+              <p class="ip-subtitle">Pick everything you need to make this new product.</p>
               <div class="ip-search-bar">
                 <img src="assets/icons/search.svg" alt="" />
                 <input type="text" id="ip-search-input" placeholder="search" autocomplete="off" />
