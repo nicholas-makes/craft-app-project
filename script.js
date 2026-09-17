@@ -383,8 +383,11 @@
     costValue.classList.remove('has-value');
 
     // Figma 269:1507: these fields hug their placeholder/value width rather
-    // than sitting in a fixed box, same as the Create Product flow.
-    [unitField, totalField, amountField, roughField, bufferField, unitCountField, unitPaidField].forEach(sizeQtyInput);
+    // than sitting in a fixed box, same as the Create Product flow. The
+    // three with an accessory suffix live in a .field-value-box (border on
+    // the wrapper, not the input), so they use sizeBareInput like ie-qty-input.
+    [unitField, bufferField, unitCountField, unitPaidField].forEach(sizeQtyInput);
+    [totalField, amountField, roughField].forEach(sizeBareInput);
 
     updateCreateButton();
     resetProductTab();
@@ -430,7 +433,9 @@
     filterProduct.classList.remove('active');
     ingredientTabContent.hidden = false;
     productTabContent.hidden = true;
-    btnCreate.hidden = false;
+    // Figma 287:9022: with neither radio selected yet, there's no CTA at
+    // all -- it only appears once the user picks Unit Item or Measurable Item.
+    btnCreate.hidden = !state.itemType;
   }
 
   filterProduct.addEventListener('click', function () {
@@ -453,6 +458,7 @@
     radioUnitHeader.classList.add('selected');
     unitFields.hidden = false;
     collapseSlot(measurableSlot, radioMeasurableHeader, measurableFields);
+    btnCreate.hidden = false;
     updateCreateButton();
   });
 
@@ -462,6 +468,7 @@
     radioMeasurableHeader.classList.add('selected');
     measurableFields.hidden = false;
     collapseSlot(unitSlot, radioUnitHeader, unitFields);
+    btnCreate.hidden = false;
     updateCreateButton();
   });
 
@@ -498,7 +505,7 @@
       bufferRow.hidden = false;
       amountField.placeholder = 'How many ' + unit + ' I have';
       amountSuffix.textContent = unit;
-      sizeQtyInput(amountField);
+      sizeBareInput(amountField);
       costLabel.textContent = 'Cost per ' + unit;
     }
 
@@ -538,12 +545,17 @@
     return Math.round(n * 100) / 100;
   }
 
-  [totalField, amountField, roughField, bufferField].forEach(function (el) {
+  [totalField, amountField, roughField].forEach(function (el) {
     el.addEventListener('input', function () {
-      sizeQtyInput(el);
+      sizeBareInput(el);
       recalcCost();
       updateCreateButton();
     });
+  });
+  bufferField.addEventListener('input', function () {
+    sizeQtyInput(bufferField);
+    recalcCost();
+    updateCreateButton();
   });
 
   // Figma 286:5495/269:1507: once a value is entered, these fields pick up

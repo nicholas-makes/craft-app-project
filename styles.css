@@ -619,6 +619,26 @@ body {
 
 .field-input::placeholder { color: var(--color-text-placeholder); }
 
+/* Figma 269:1507/286:5495: the border/background live on this wrapper, not
+   the <input> itself, so an accessory suffix (unit/USD) can sit inside the
+   same pill next to the value -- same structure as .ie-qty-box. */
+.field-value-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 0.5px solid var(--color-input-border);
+  background: var(--color-input-bg);
+  border-radius: 10px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
+.field-value-box .field-input {
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+.field-value-box .suffix-text { padding-right: 0; margin-left: 0; }
+
 .field-row.unit-row .field-input {
   color: var(--color-text-placeholder);
   cursor: pointer;
