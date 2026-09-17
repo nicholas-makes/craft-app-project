@@ -840,6 +840,7 @@
       row.className = 'ingredient-editable';
       var dataKey = 'v' + vIndex + '-i' + ingIndex;
       var qtyPlaceholder = ing.unit === 'unit' ? 'add units' : 'add quantity';
+      var hasQty = ing.quantity && String(ing.quantity).trim().length > 0;
       row.innerHTML =
         '<div class="ie-header">' +
           '<p class="ie-name">' + ing.name + '</p>' +
@@ -848,12 +849,15 @@
         '<div class="ie-input-row">' +
           '<div class="ie-left">' +
             '<button class="ie-remove"><img src="assets/icons/x-small-dark.svg" alt=""></button>' +
-            '<input class="ie-qty-input" data-key="' + dataKey + '" inputmode="decimal" placeholder="' + qtyPlaceholder + '" value="' + (ing.quantity || '') + '" />' +
+            '<div class="ie-qty-box">' +
+              '<input class="ie-qty-input" data-key="' + dataKey + '" inputmode="decimal" placeholder="' + qtyPlaceholder + '" value="' + (ing.quantity || '') + '" />' +
+              (hasQty ? '<span class="ie-qty-suffix">' + unitLabel(ing.unit) + '</span>' : '') +
+            '</div>' +
           '</div>' +
           '<span class="ie-line-total">' + (total !== null ? '$' + total.toFixed(2) : '..') + '</span>' +
         '</div>';
       var qtyInput = row.querySelector('.ie-qty-input');
-      sizeQtyInput(qtyInput);
+      sizeBareInput(qtyInput);
       qtyInput.addEventListener('input', function () {
         ing.quantity = qtyInput.value;
         renderVariations();

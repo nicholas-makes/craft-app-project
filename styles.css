@@ -10,8 +10,8 @@
   --color-text-muted: #8b8c87;
   --color-text-muted-2: #9c9c95;
   --color-text-placeholder: #ada9a4;
-  --color-input-bg: #f6f4f1;
-  --color-input-border: #decea2;
+  --color-input-bg: #fbf8f4;
+  --color-input-border: #e7ac08;
   --color-input-text: #423525;
   --color-olive: #3b3f0a;
   --color-olive-text: #f2f2f2;
@@ -898,21 +898,34 @@ body {
 }
 .ie-remove img { width: 8px; height: 8px; }
 
-.ie-qty-input {
-  font-family: 'Poppins', sans-serif;
-  font-size: 16px;
+/* Figma 275:1528: the border/background live on the row, not the <input>
+   itself -- a plain input plus a trailing unit label ("sq ft"/"units")
+   that only appears once a quantity is entered. */
+.ie-qty-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   border: 0.5px solid var(--color-input-border);
   background: var(--color-input-bg);
   border-radius: 10px;
   padding: 6px 12px;
+  flex-shrink: 0;
+}
+.ie-qty-input {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  border: none;
+  background: transparent;
+  padding: 0;
   color: var(--color-input-text);
   outline: none;
   flex-shrink: 0;
   /* Figma hugs whatever text is showing (placeholder or value) instead of
-     a fixed box -- width is measured and set in JS (see sizeQtyInput)
+     a fixed box -- width is measured and set in JS (see sizeBareInput)
      since a plain <input> doesn't auto-size to its own content. */
 }
 .ie-qty-input::placeholder { color: var(--color-text-placeholder); }
+.ie-qty-suffix { font-size: 16px; color: var(--color-text-muted-2); white-space: nowrap; }
 
 .ie-line-total {
   font-size: 16px;
