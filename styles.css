@@ -784,7 +784,11 @@ body {
   list-style: none;
   margin: 0;
   padding: 0;
+  /* Leaves a gap on the right for the scroll indicator to sit in, instead
+     of the indicator overlapping the item backgrounds. */
+  padding-right: 10px;
   width: 100%;
+  box-sizing: border-box;
   height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -818,7 +822,8 @@ body {
   position: absolute;
   top: 0;
   bottom: 0;
-  right: 4px;
+  /* Centered in the 10px gap .unit-list's padding-right reserves for it. */
+  right: 3.5px;
 }
 
 .scrollbar-thumb {
