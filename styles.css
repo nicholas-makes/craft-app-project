@@ -637,8 +637,6 @@ body {
   background: transparent;
   padding: 0;
 }
-.field-value-box .suffix-text { padding-right: 0; margin-left: 0; }
-
 .field-row.unit-row .field-input {
   color: var(--color-text-placeholder);
   cursor: pointer;
@@ -651,11 +649,11 @@ body {
 
 .field-row .spacer { flex: 1; }
 
+/* Lives inside .field-value-box, right next to the value -- same tight
+   4px flex gap as .ie-qty-box/.ie-qty-suffix in the Create Product flow. */
 .field-row .suffix-text {
   font-size: 16px;
   color: var(--color-text-muted-2);
-  padding-right: 16px;
-  margin-left: 8px;
 }
 
 .chevron-btn {
