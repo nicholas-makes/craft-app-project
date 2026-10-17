@@ -1453,6 +1453,34 @@ body {
 .plan-logo-block { display: flex; justify-content: center; padding: 16px 0; flex-shrink: 0; }
 .plan-logo { width: 67px; height: 40px; display: block; }
 
+/* Figma 2043:3883: dark olive card, title + body stacked, right-aligned text button. */
+.mark-sale-card {
+  background: var(--color-olive);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  flex-shrink: 0;
+}
+.mark-sale-text { display: flex; flex-direction: column; color: var(--color-btn-text); }
+.mark-sale-title { margin: 0; font-size: 22px; line-height: 33px; font-weight: 500; }
+.mark-sale-desc { margin: 0; font-size: 16px; line-height: 24px; }
+.mark-sale-cta {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.mark-sale-cta span { font-size: 14px; line-height: 21px; font-weight: 500; color: var(--color-btn-text); }
+.mark-sale-cta img { width: 12px; height: 10px; }
+
 .plan-page-content .title-block { gap: 0; }
 .plan-page-content .page-title { font-size: 22px; }
 .plan-page-content .page-subtitle { margin: 0; font-size: 16px; color: var(--color-text-primary); }
