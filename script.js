@@ -255,10 +255,10 @@
     listProducts.hidden = true;
   });
 
-  /* ---------------- bottom nav (Catalog + Plan are real pages; Home/Analytics/
-     Profile aren't built out, so clicking them shows the selected state --
-     pill highlight and the actual selected icon graphic -- without navigating
-     anywhere, matching Figma's nav-bar component states for every icon.
+  /* ---------------- bottom nav (Catalog + Plan are real pages; Analytics/
+     Profile aren't built out, so clicking them shows the selected pill
+     without navigating anywhere). Figma V2's icons are the same in every
+     state -- only the mustard pill marks selection.
      Each page has its own copy of the nav-bar, so every update below applies
      to all of them at once to keep them in sync when the page changes. */
   var pageCatalog = document.getElementById('page-catalog');
@@ -266,10 +266,7 @@
 
   function setActiveNav(navName) {
     document.querySelectorAll('.nav-item').forEach(function (btn) {
-      var isActive = btn.dataset.nav === navName;
-      btn.classList.toggle('active', isActive);
-      var img = btn.querySelector('img');
-      img.src = 'assets/nav/' + btn.dataset.nav + (isActive ? '-selected.svg' : '-unselected.svg');
+      btn.classList.toggle('active', btn.dataset.nav === navName);
     });
   }
 
@@ -285,7 +282,7 @@
         pagePlan.hidden = false;
         renderPlanCardsTop();
       }
-      // Home/Analytics/Profile: no page to switch to, so the current one stays.
+      // Analytics/Profile: no page to switch to, so the current one stays.
     });
   });
 
@@ -320,7 +317,10 @@
   var bufferRow = document.getElementById('buffer-row');
   var bufferField = document.getElementById('buffer-field');
   var unitCountField = document.getElementById('unit-count-field');
+  var unitCountSuffix = document.getElementById('unit-count-suffix');
   var unitPaidField = document.getElementById('unit-paid-field');
+  var unitPaidSuffix = document.getElementById('unit-paid-suffix');
+  var unitCostValue = document.getElementById('unit-cost-value');
   var costLabel = document.getElementById('cost-label');
   var costValue = document.getElementById('cost-value');
   var btnCreate = document.getElementById('btn-create');
@@ -328,6 +328,7 @@
   var btnOpenUnitPicker = document.getElementById('btn-open-unit-picker');
   var btnCloseUnitPicker = document.getElementById('btn-close-unit-picker');
   var unitPicker = document.getElementById('unit-picker');
+  var unitPickerScrim = document.getElementById('unit-picker-scrim');
   var unitList = document.getElementById('unit-list');
   var scrollbarThumb = document.getElementById('scrollbar-thumb');
 
@@ -349,7 +350,6 @@
     state.branch = null;
 
     nameInput.value = '';
-    nameInput.classList.remove('filled');
 
     // The popup opens on whichever tab is currently active on the Catalog
     // page (Products or Ingredients) -- not always Product.
@@ -381,13 +381,19 @@
     costLabel.textContent = 'Cost per..';
     costValue.textContent = '$';
     costValue.classList.remove('has-value');
+    unitCountField.value = '';
+    unitCountSuffix.hidden = true;
+    unitPaidField.value = '';
+    unitPaidSuffix.hidden = true;
+    unitCostValue.textContent = '$';
+    unitCostValue.classList.remove('has-value');
 
     // Figma 269:1507: these fields hug their placeholder/value width rather
     // than sitting in a fixed box, same as the Create Product flow. The
-    // three with an accessory suffix live in a .field-value-box (border on
+    // ones with an accessory suffix live in a .field-value-box (border on
     // the wrapper, not the input), so they use sizeBareInput like ie-qty-input.
-    [unitField, bufferField, unitCountField, unitPaidField].forEach(sizeQtyInput);
-    [totalField, amountField, roughField].forEach(sizeBareInput);
+    [unitField, bufferField].forEach(sizeQtyInput);
+    [totalField, amountField, roughField, unitCountField, unitPaidField].forEach(sizeBareInput);
 
     updateCreateButton();
     resetProductTab();
@@ -400,14 +406,14 @@
 
   function closeAddModal() {
     modalAdd.classList.remove('open');
-    unitPicker.classList.remove('open');
+    closeUnitPicker();
   }
 
   btnOpenAdd.addEventListener('click', openAddModal);
   btnCancel.addEventListener('click', closeAddModal);
 
   nameInput.addEventListener('input', function () {
-    nameInput.classList.toggle('filled', nameInput.value.trim().length > 0);
+    sizeQtyInput(nameInput);
     updateCreateButton();
     // updateCreateButton() only ever gates the Create Ingredient button --
     // Create Product's readiness (which also depends on the name) is
@@ -426,6 +432,9 @@
     productTabContent.hidden = false;
     ingredientTabContent.hidden = true;
     btnCreate.hidden = true;
+    nameInput.placeholder = 'Enter Product Name';
+    sizeQtyInput(nameInput);
+    updateAddVariationButton();
   }
 
   function showIngredientTab() {
@@ -433,6 +442,9 @@
     filterProduct.classList.remove('active');
     ingredientTabContent.hidden = false;
     productTabContent.hidden = true;
+    nameInput.placeholder = 'Enter Ingredient Name';
+    sizeQtyInput(nameInput);
+    updateAddVariationButton();
     // Figma 287:9022: with neither radio selected yet, there's no CTA at
     // all -- it only appears once the user picks Unit Item or Measurable Item.
     btnCreate.hidden = !state.itemType;
@@ -472,16 +484,20 @@
     updateCreateButton();
   });
 
-  /* Unit picker open/close */
-  btnOpenUnitPicker.addEventListener('click', function () {
+  /* Unit picker open/close (the sheet and its scrim move together) */
+  function openUnitPicker() {
     unitPicker.classList.add('open');
-  });
-  unitRow.addEventListener('click', function () {
-    unitPicker.classList.add('open');
-  });
-  btnCloseUnitPicker.addEventListener('click', function () {
+    unitPickerScrim.classList.add('open');
+    updateScrollbar();
+  }
+  function closeUnitPicker() {
     unitPicker.classList.remove('open');
-  });
+    unitPickerScrim.classList.remove('open');
+  }
+  btnOpenUnitPicker.addEventListener('click', openUnitPicker);
+  unitRow.addEventListener('click', openUnitPicker);
+  btnCloseUnitPicker.addEventListener('click', closeUnitPicker);
+  unitPickerScrim.addEventListener('click', closeUnitPicker);
 
   unitList.addEventListener('click', function (e) {
     var li = e.target.closest('.unit-option');
@@ -503,13 +519,12 @@
       roughRow.hidden = true;
       amountRow.hidden = false;
       bufferRow.hidden = false;
-      amountField.placeholder = 'How many ' + unit + ' I have';
       amountSuffix.textContent = unit;
       sizeBareInput(amountField);
       costLabel.textContent = 'Cost per ' + unit;
     }
 
-    unitPicker.classList.remove('open');
+    closeUnitPicker();
     recalcCost();
     updateCreateButton();
   });
@@ -571,30 +586,55 @@
     roughSuffix.hidden = roughField.value.trim().length === 0;
   });
 
+  /* Unit Item fields (Frames 59/63): "10 units", "120 USD", Cost per unit $10 */
+  function recalcUnitCost() {
+    var count = parseFloat(unitCountField.value);
+    var paid = parseFloat(unitPaidField.value);
+    var ok = !isNaN(count) && count > 0 && !isNaN(paid);
+    unitCostValue.textContent = ok ? '$' + round2(paid / count) : '$';
+    unitCostValue.classList.toggle('has-value', ok);
+  }
+
+  [[unitCountField, unitCountSuffix], [unitPaidField, unitPaidSuffix]].forEach(function (pair) {
+    var field = pair[0];
+    var suffix = pair[1];
+    field.addEventListener('input', function () {
+      suffix.hidden = field.value.trim().length === 0;
+      sizeBareInput(field);
+      recalcUnitCost();
+      updateCreateButton();
+    });
+  });
+
   function updateCreateButton() {
     var ready = false;
-    var readyButForName = false;
-    if (!ingredientTabContent.hidden && state.itemType === 'measurable') {
+    if (!ingredientTabContent.hidden && state.itemType) {
       var hasName = nameInput.value.trim().length > 0;
-      var hasUnit = !!state.unit;
-      var total = parseFloat(totalField.value);
-      var hasTotal = !isNaN(total) && total > 0;
-      var branchOk = false;
-      if (state.branch === 'rough') {
-        var uses = parseFloat(roughField.value);
-        branchOk = !isNaN(uses) && uses > 0;
-      } else if (state.branch === 'granular') {
-        var amount = parseFloat(amountField.value);
-        branchOk = !isNaN(amount) && amount > 0;
+      var fieldsOk = false;
+      if (state.itemType === 'unit') {
+        var count = parseFloat(unitCountField.value);
+        var paid = parseFloat(unitPaidField.value);
+        fieldsOk = !isNaN(count) && count > 0 && !isNaN(paid) && paid > 0;
+      } else {
+        var hasUnit = !!state.unit;
+        var total = parseFloat(totalField.value);
+        var hasTotal = !isNaN(total) && total > 0;
+        var branchOk = false;
+        if (state.branch === 'rough') {
+          var uses = parseFloat(roughField.value);
+          branchOk = !isNaN(uses) && uses > 0;
+        } else if (state.branch === 'granular') {
+          var amount = parseFloat(amountField.value);
+          branchOk = !isNaN(amount) && amount > 0;
+        }
+        fieldsOk = hasUnit && hasTotal && branchOk;
       }
-      readyButForName = hasUnit && hasTotal && branchOk;
-      ready = hasName && readyButForName;
+      // The name is required: with everything else filled in, the button
+      // stays disabled under its normal label until a name is typed.
+      ready = hasName && fieldsOk;
     }
     btnCreate.classList.toggle('ready', ready);
     btnCreate.disabled = !ready;
-    // Everything but the name is filled in -- nudge the user toward what's
-    // actually missing instead of leaving a silently-disabled button.
-    btnCreate.textContent = (!ready && readyButForName) ? 'enter a name' : 'Create Ingredient';
   }
 
   /* functional scrollbar thumb for unit list */
@@ -647,7 +687,10 @@
     var name = nameInput.value.trim();
     var unit = state.unit;
     var subText;
-    if (state.branch === 'rough') {
+    if (state.itemType === 'unit') {
+      var count = parseFloat(unitCountField.value);
+      subText = count + ' / ' + count;
+    } else if (state.branch === 'rough') {
       var uses = parseFloat(roughField.value);
       subText = uses + ' uses';
     } else {
@@ -670,7 +713,7 @@
 
   /* clicking outside the sheet content but still in the peek margin closes it too */
   unitPicker.addEventListener('click', function (e) {
-    if (e.target === unitPicker) unitPicker.classList.remove('open');
+    if (e.target === unitPicker) closeUnitPicker();
   });
 
   /* ================= Create Product flow (Frames 64, 66-77) ================= */
@@ -780,6 +823,20 @@
         block.appendChild(renderIngredientRow(v, vIndex, ing, ingIndex));
       });
 
+      // Hours to make row (Figma 287:7115: sits above "Add Ingredients")
+      var hoursRow = document.createElement('div');
+      hoursRow.className = 'field-row hours-row';
+      var hasHours = v.hours !== null && v.hours > 0;
+      hoursRow.innerHTML =
+        '<span class="icon-slot"><img src="assets/icons/stopwatch.svg" alt="" style="width:14px;height:16px"></span>' +
+        '<span class="hours-input' + (hasHours ? ' filled' : '') + '">' +
+          (hasHours ? v.hours.toFixed(1) + '<span class="hours-suffix">hours</span>' : 'Hours to make') +
+        '</span>' +
+        '<span class="spacer"></span>' +
+        '<span class="info-slot"><img src="assets/icons/info.svg" alt=""></span>';
+      hoursRow.querySelector('.hours-input').addEventListener('click', function () { openHoursSheet(vIndex); });
+      block.appendChild(hoursRow);
+
       // + Add Ingredient row. Figma metadata: icon slot (44) then text
       // starting 4px later (gap-4), not flush -- reuse the exact same
       // .simple-row/.row-left structure as the static Frame 64 row rather
@@ -794,20 +851,6 @@
         '<button class="chevron-btn"><img src="assets/icons/caret-right.svg" alt=""></button>';
       addRow.addEventListener('click', function () { openIngredientPicker(vIndex); });
       block.appendChild(addRow);
-
-      // Hours to make row
-      var hoursRow = document.createElement('div');
-      hoursRow.className = 'field-row hours-row';
-      var hasHours = v.hours !== null && v.hours > 0;
-      hoursRow.innerHTML =
-        '<span class="icon-slot"><img src="assets/icons/stopwatch.svg" alt="" style="width:14px;height:16px"></span>' +
-        '<span class="hours-input' + (hasHours ? ' filled' : '') + '">' +
-          (hasHours ? v.hours.toFixed(1) + '<span class="hours-suffix">hours</span>' : 'Hours to make') +
-        '</span>' +
-        '<span class="spacer"></span>' +
-        '<span class="info-slot"><img src="assets/icons/info.svg" alt=""></span>';
-      hoursRow.querySelector('.hours-input').addEventListener('click', function () { openHoursSheet(vIndex); });
-      block.appendChild(hoursRow);
 
       // Total display.
       // Figma shows the "Total cost..." placeholder for as long as ANY
@@ -841,13 +884,19 @@
     var anyIngredients = productVariations.some(function (v) { return v.ingredients.length > 0; });
     productFooter.hidden = !anyIngredients;
 
-    var readyButForName = anyIngredients && productVariations.every(variationReady);
-    var allReady = readyButForName && nameInput.value.trim().length > 0;
+    // Figma 287:7099: with everything else filled in, Create Product stays
+    // disabled under its normal label until a name is typed.
+    var allReady = anyIngredients && productVariations.every(variationReady) && nameInput.value.trim().length > 0;
     btnCreateProduct.classList.toggle('ready', allReady);
     btnCreateProduct.disabled = !allReady;
-    // Everything but the name is filled in -- nudge the user toward what's
-    // actually missing instead of leaving a silently-disabled button.
-    btnCreateProduct.textContent = (!allReady && readyButForName) ? 'enter a name' : 'Create Product';
+    updateAddVariationButton();
+  }
+
+  // "Add Variation" lives in the header row (Figma 2111:3939), only on the
+  // Product tab and only once a variation has ingredients.
+  function updateAddVariationButton() {
+    var anyIngredients = productVariations.some(function (v) { return v.ingredients.length > 0; });
+    btnAddVariation.hidden = productTabContent.hidden || !anyIngredients;
   }
 
   // Figma's qty/hours inputs hug whatever text they're showing rather than
@@ -892,7 +941,8 @@
       var total = lineTotal(ing);
       row.className = 'ingredient-editable';
       var dataKey = 'v' + vIndex + '-i' + ingIndex;
-      var qtyPlaceholder = 'how many ' + unitLabel(ing.unit);
+      // Figma 275:4162: "how many sqft?" / "how many units?"
+      var qtyPlaceholder = 'how many ' + (ing.unit === 'unit' ? 'units' : ing.unit) + '?';
       var hasQty = ing.quantity && String(ing.quantity).trim().length > 0;
       row.innerHTML =
         '<div class="ie-header">' +
@@ -957,6 +1007,8 @@
   var ipList = document.getElementById('ip-list');
   var ipSearchInput = document.getElementById('ip-search-input');
   var ipClearSelection = document.getElementById('btn-clear-selection');
+  var ipSelectAll = document.getElementById('btn-select-all');
+  var ipVisibleItems = []; // what renderIpList last showed, for Select All
   var btnCloseIngredientPicker = document.getElementById('btn-close-ingredient-picker');
   var btnDoneIngredientPicker = document.getElementById('btn-done-ingredient-picker');
   var ipFilterChips = Array.prototype.slice.call(document.querySelectorAll('.filter-chip'));
@@ -997,12 +1049,19 @@
       return true;
     });
 
+    ipVisibleItems = items;
+    // Figma 65 vs 103: Clear Selection only appears once something is
+    // selected; Select All is checked once every visible item is.
+    ipClearSelection.hidden = Object.keys(ipSelected).length === 0;
+    ipSelectAll.classList.toggle('selected', items.length > 0 && items.every(function (item) { return ipSelected[item.name]; }));
+
     ipList.innerHTML = '';
     items.forEach(function (item) {
       var li = document.createElement('li');
       var isSelected = !!ipSelected[item.name];
       li.className = 'ip-row' + (isSelected ? ' selected' : '');
-      var priceLabel = item.type === 'unit' ? ('$' + item.flatPrice.toFixed(2)) : ('$' + item.rate + ' / ' + item.unit);
+      // Figma 275:3799: "$2.73 / sq ft", "$2.73 / units", "$2.73 / use"
+      var priceLabel = item.type === 'unit' ? ('$' + item.flatPrice.toFixed(2) + ' / use') : ('$' + item.rate + ' / ' + unitLabel(item.unit));
       li.innerHTML =
         '<div class="ip-left">' +
           '<span class="ip-checkbox"></span>' +
@@ -1026,6 +1085,13 @@
   });
   ipClearSelection.addEventListener('click', function () {
     ipSelected = {};
+    renderIpList();
+  });
+  ipSelectAll.addEventListener('click', function () {
+    var allSelected = ipSelectAll.classList.contains('selected');
+    ipVisibleItems.forEach(function (item) {
+      if (allSelected) { delete ipSelected[item.name]; } else { ipSelected[item.name] = true; }
+    });
     renderIpList();
   });
   btnCloseIngredientPicker.addEventListener('click', closeIngredientPicker);
@@ -1151,7 +1217,7 @@
   ];
 
   var PF_TAG_LABEL = { 'in-stock': 'In Stock', 'restock': 'Restock', 'available': 'Available', 'at-risk': 'At Risk' };
-  var PF_TAG_CLASS = { 'in-stock': 'neutral', 'restock': 'alert', 'available': 'neutral', 'at-risk': 'low' };
+  var PF_TAG_CLASS = { 'in-stock': 'neutral', 'restock': 'alert', 'available': 'neutral', 'at-risk': 'at-risk' };
 
   function unitLabel(unit) {
     if (unit === 'sqft') return 'sq ft';
@@ -1197,12 +1263,11 @@
         var isSelected = Object.prototype.hasOwnProperty.call(pfSelected, p.name);
         var li = document.createElement('li');
         li.className = 'pf-product-card' + (isSelected ? ' selected' : '');
-        var subClass = 'pf-product-sub' + (p.tag === 'restock' ? ' alert' : '');
         li.innerHTML =
           '<div class="pf-product-card-top">' +
             '<div class="pf-product-card-left">' +
               '<span class="pf-checkbox"></span>' +
-              '<div class="pf-product-text"><p class="pf-product-name">' + p.name + '</p><p class="' + subClass + '">' + p.sub + '</p></div>' +
+              '<div class="pf-product-text"><p class="pf-product-name">' + p.name + '</p><p class="pf-product-sub">' + p.sub + '</p></div>' +
             '</div>' +
             '<span class="status-tag ' + PF_TAG_CLASS[p.tag] + '">' + PF_TAG_LABEL[p.tag] + '</span>' +
           '</div>' +
@@ -1296,14 +1361,14 @@
               '<span class="pf-need-unit">more ' + unitLabel(need.unit) + '</span>' +
             '</div>' +
           '</div>' +
-          '<span class="pf-ingredient-cost">$' + cost.toFixed(2) + '</span>' +
+          '<span class="pf-ingredient-cost">$' + round2(cost) + '</span>' +
         '</div>';
       var input = li.querySelector('input');
       sizeBareInput(input);
       input.addEventListener('input', function () {
         var q = parseFloat(input.value);
         need.needMore = isNaN(q) ? 0 : q;
-        li.querySelector('.pf-ingredient-cost').textContent = '$' + (need.needMore * need.rate).toFixed(2);
+        li.querySelector('.pf-ingredient-cost').textContent = '$' + round2(need.needMore * need.rate);
         sizeBareInput(input);
       });
       pfIngredientList.appendChild(li);
@@ -1350,7 +1415,7 @@
             '<p class="plan-card-title">Plan for future orders</p>' +
             '<span class="plan-card-cta"><span>Start</span><img src="assets/icons/arrow-right.svg" alt=""></span>' +
           '</div>' +
-          '<p class="plan-card-desc">Select what you\'re planning to make and we\'ll put a shopping list together for you.</p>' +
+          '<p class="plan-card-desc">Select what you’re planning to make and we’ll put a shopping list together for you.</p>' +
         '</div>';
     } else {
       var lines = lastPurchaseList.lines.map(function (l) {
